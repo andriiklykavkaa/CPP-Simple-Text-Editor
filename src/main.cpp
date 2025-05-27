@@ -1,8 +1,8 @@
 #include <iostream>
 #include <sstream>
 
-#include "../include/commands.h"
-#include "../include/file_interaction.h"
+#include "../include/command_execution.h"
+#include "../include/models/AppContext.h"
 
 enum CommandType {
     help = 0,
@@ -14,42 +14,66 @@ enum CommandType {
     insert = 6,
     spot = 7,
     vanish = 8,
-    finish = 9
+    undo = 9,
+    redo = 10,
+    cutout = 11,
+    paste = 12,
+    duplicate = 13,
+    interchange = 14,
+    finish = 15,
+    COUNT = 16
 };
 
-void handleCommand(Buffer &buffer, CommandType command) {
+void handleCommand(AppContext &context, CommandType command) {
     switch (command) {
         case help:
             showInstructions();
             break;
         case append:
-            appendText(buffer);
+            appendText(context);
             break;
         case newline:
-            addNewLine(buffer);
+            addNewLine(context);
             break;
         case save:
-            saveFile(buffer);
+            saveFile(context);
             break;
         case load:
-            loadFile(buffer);
+            loadFile(context);
             break;
         case print:
-            printText(buffer);
+            printText(context);
             break;
         case insert:
-            insertByLineAndIndex(buffer);
+            insertByLineAndIndex(context);
             break;
         case spot:
-            searchText(buffer);
+            searchText(context);
             break;
         case vanish:
-            deleteText(buffer);
-        break;
+            deleteText(context);
+            break;
+        case undo:
+            undoCommand(context);
+            break;
+        case redo:
+            redoCommand(context);
+            break;
+        case cutout:
+            cutText(context);
+            break;
+        case paste:
+            pasteText(context);
+            break;
+        case duplicate:
+            copyText(context);
+            break;
+        case interchange:
+
+            break;
         case finish:
             exitProgram();
             break;
-
     }
 }
 
@@ -59,10 +83,13 @@ bool isDigit(const string &s) {
     return iss >> std::noskipws >> d && iss.eof();
 }
 
-[[noreturn]] int main()
-{
-    Buffer buffer(8);
-    std::cout << "Welcome to text editor." << std::endl;
+[[noreturn]] int main() {
+    TextEditor editor(16);
+    CommandManager manager(5);
+
+    AppContext context(editor, manager);
+
+    std::cout << "Welcome to text editor!" << std::endl;
 
     while(true) {
         string input;
@@ -79,11 +106,11 @@ bool isDigit(const string &s) {
         }
 
         int num = stoi(input);
-        if (num < 0 || num > 8) {
+        if (num < 0 || num >= CommandType::COUNT) {
             cerr << "Unrecognized command number." << endl;
         }
 
         auto command = static_cast<CommandType>(num);
-        handleCommand(buffer, command);
+        handleCommand(context, command);
     }
 }
