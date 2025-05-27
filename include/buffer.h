@@ -30,7 +30,8 @@ public:
     void insert(size_t line_idx, size_t char_idx, const string& text) const;
     void search(const string &text) const;
     void loadLine(string &text);
-    
+    void deleteText(size_t line_idx, size_t char_idx, size_t length);
+
     Buffer(const Buffer&) = delete;
     Buffer& operator=(const Buffer&) = delete;
 };

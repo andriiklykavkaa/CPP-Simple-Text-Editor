@@ -10,4 +10,6 @@ add_executable(TextEditorCPP src/main.cpp
         include/commands.h
         src/file_interaction.cpp
         include/file_interaction.h
+        src/ActivityHistory.cpp
+        include/ActivityHistory.h
 )

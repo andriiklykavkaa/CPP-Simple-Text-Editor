@@ -88,7 +88,6 @@ public:
     [[nodiscard]] string getString() const {
         return "(" + to_string(lineIdx) + ", " + to_string(charIdx) + ")";
     }
-
 } ;
 
 class SearchResult {
@@ -117,7 +116,6 @@ public:
     }
 
     ~SearchResult() {
-        cout << "Deleting SearchResult...";
         delete[] tuples;
     }
 
@@ -151,6 +149,22 @@ void Buffer::search(const string &text) const {
     cout << "Found at positions: ";
     result.print();
     cout << endl;
+}
+
+void Buffer::deleteText(size_t lineIdx, size_t charIdx, size_t length) {
+    if (lineIdx >= height) return;
+
+    string &line = lines[lineIdx];
+
+    if (charIdx == 0 && length > line.length()) {
+        for (size_t i = lineIdx; i < height - 1; i++) {
+            lines[i] = lines[i+1];
+        }
+        --height;
+    } else {
+        if(charIdx >= line.length()) return;
+        line.erase(charIdx, length);
+    }
 }
 
 void Buffer::loadLine(string &text) {

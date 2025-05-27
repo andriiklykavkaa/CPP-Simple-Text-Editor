@@ -45,6 +45,7 @@ void handleCommand(Buffer &buffer, CommandType command) {
             break;
         case vanish:
             deleteText(buffer);
+        break;
         case finish:
             exitProgram();
             break;

@@ -20,7 +20,8 @@ void showInstructions() {
     cout << "5 - print text." << endl;
     cout << "6 - insert in text by line and index." << endl;
     cout << "7 - search in text." << endl;
-    cout << "8 - exit program." << endl;
+    cout << "7 - delete in text." << endl;
+    cout << "9 - exit program." << endl;
 }
 
 void appendText(const Buffer &buffer) {
@@ -85,7 +86,23 @@ void searchText(const Buffer &buffer) {
 }
 
 void deleteText(Buffer &buffer) {
+    size_t lineIdx;
+    size_t charIdx;
+    size_t length;
 
+    while(true) {
+        cout << "Enter line index, char index, length: ";
+        cin >> lineIdx >> charIdx >> length;
+
+        if (cin.fail()) {
+            cerr << "Invalid input. Please enter three integers." << endl;
+        } else {
+            break;
+        }
+    }
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    buffer.deleteText(lineIdx, charIdx, length);
 }
 
 void exitProgram() {
