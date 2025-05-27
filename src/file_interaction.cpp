@@ -6,7 +6,7 @@
 #include <iostream>
 
 #include "../include/file_interaction.h"
-#include "../include/buffer.h"
+#include "../include/Buffer.h"
 
 using namespace std;
 

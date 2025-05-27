@@ -4,7 +4,7 @@
 
 #ifndef COMMANDS_H
 #define COMMANDS_H
-#include "buffer.h"
+#include "Buffer.h"
 
 void showInstructions();
 void appendText(const Buffer &buffer);

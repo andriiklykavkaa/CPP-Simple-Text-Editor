@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include <string>
-#include "../include/buffer.h"
+#include "../../include/Buffer.h"
 
 using namespace std;
 

@@ -3,7 +3,7 @@
 //
 
 #include "../include/commands.h"
-#include "../include/buffer.h"
+#include "../include/Buffer.h"
 #include "../include/file_interaction.h"
 
 #include <iostream>

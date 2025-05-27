@@ -4,7 +4,7 @@
 
 #ifndef FILE_INTERACTION_H
 #define FILE_INTERACTION_H
-#include "buffer.h"
+#include "Buffer.h"
 
 void writeBufferToFile(const Buffer &buffer, const string &path);
 void readFileToBuffer(Buffer &buffer, const string &path);
