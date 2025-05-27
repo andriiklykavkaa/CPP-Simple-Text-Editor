@@ -4,10 +4,10 @@
 
 #ifndef FILE_INTERACTION_H
 #define FILE_INTERACTION_H
-#include "buffer.h"
+#include "models/TextEditor.h"
 
-void writeBufferToFile(const Buffer &buffer, const string &path);
-void readFileToBuffer(Buffer &buffer, const string &path);
+void writeBufferToFile(const TextEditor &editor, const string &path);
+void readFileToBuffer(TextEditor &editor, const string &path);
 
 
 #endif //FILE_INTERACTION_H

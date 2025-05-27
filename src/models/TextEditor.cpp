@@ -2,15 +2,13 @@
 // Created by Andrii Klykavka on 26.05.2025.
 //
 
-
-
 #include <iostream>
 #include <string>
-#include "../include/buffer.h"
+#include "../../include/models/TextEditor.h"
 
 using namespace std;
 
-void Buffer::reallocate(size_t newCapacity) {
+void TextEditor::reallocate(size_t newCapacity) {
     auto* newLines = new string[newCapacity];
     for (size_t i = 0; i < height; i++) {
         newLines[i] = lines[i];
@@ -20,56 +18,61 @@ void Buffer::reallocate(size_t newCapacity) {
     capacity = newCapacity;
 }
 
-Buffer::Buffer(size_t capacity):
+TextEditor::TextEditor(size_t capacity):
 lines(new string[capacity]), height(1), capacity(capacity) {}
 
-Buffer::~Buffer() {
+TextEditor::~TextEditor() {
     delete[] lines;
 }
 
-string* Buffer::getLines() const {
+string* TextEditor::getLines() const {
     return lines;
 }
 
-size_t Buffer::getHeight() const {
+size_t TextEditor::getHeight() const {
     return height;
 }
 
-size_t Buffer::getCapacity() const {
+size_t TextEditor::getCapacity() const {
     return capacity;
 }
 
-void Buffer::printBuffer() const {
+string TextEditor::getBufferText() const {
+    return bufferText;
+}
+
+void TextEditor::setBufferText(string text) {
+    bufferText = move(text);
+}
+
+void TextEditor::printBuffer() const {
     for (size_t i = 0; i < height; i++) {
         cout << lines[i]<< endl;
     }
 }
 
-void Buffer::appendText(const string &text) const {
+void TextEditor::appendText(const string &text) const {
     lines[height-1].append(text);
 }
 
-void Buffer::addLine() {
+void TextEditor::addLine() {
     if (height >= capacity) {
         reallocate(capacity * 2);
     }
     height++;
 }
 
-void Buffer::insert(size_t line_idx, size_t char_idx, const string &text) const {
-    if (line_idx >= height) {
-        printf("Line index out of bounds.");
-        return;
+void TextEditor::deleteLine(size_t lineIdx) {
+    for (size_t i = lineIdx; i < height - 1; i++) {
+        lines[i] = lines[i+1];
     }
-
-    if(lines[line_idx].length() > char_idx) {
-        printf("Char index out of bounds.");
-        return;
-    }
-
-    lines[line_idx].insert(char_idx, text);
+    --height;
 }
 
+void TextEditor::insertText(size_t lineIdx, size_t charIdx, const string &text) const {
+    if (!areIndicesInRange(lineIdx, charIdx)) return;
+    lines[lineIdx].insert(charIdx, text);
+}
 
 class IndexTuple {
 private:
@@ -88,8 +91,7 @@ public:
     [[nodiscard]] string getString() const {
         return "(" + to_string(lineIdx) + ", " + to_string(charIdx) + ")";
     }
-
-} ;
+};
 
 class SearchResult {
 private:
@@ -117,7 +119,6 @@ public:
     }
 
     ~SearchResult() {
-        cout << "Deleting SearchResult...";
         delete[] tuples;
     }
 
@@ -136,7 +137,7 @@ public:
     }
 };
 
-void Buffer::search(const string &text) const {
+void TextEditor::search(const string &text) const {
     SearchResult result(8);
 
     size_t pos = 0;
@@ -153,10 +154,57 @@ void Buffer::search(const string &text) const {
     cout << endl;
 }
 
-void Buffer::loadLine(string &text) {
+string TextEditor::getText(size_t lineIdx, size_t charIdx, size_t length) {
+    if (!areIndicesInRange(lineIdx, charIdx)) return NULL;
+    return lines[lineIdx].substr(charIdx, length);
+}
+
+void TextEditor::deleteText(size_t lineIdx, size_t charIdx, size_t length) {
+    if (!areIndicesInRange(lineIdx, charIdx)) return;
+    lines[lineIdx].erase(charIdx, length);
+}
+
+void TextEditor::cutText(size_t lineIdx, size_t charIdx, size_t length) {
+    if (!areIndicesInRange(lineIdx, charIdx)) return;
+    bufferText = lines[lineIdx].substr(charIdx, length);
+    lines[lineIdx].erase(charIdx, length);
+}
+
+void TextEditor::copyText(size_t lineIdx, size_t charIdx, size_t length) {
+    if (!areIndicesInRange(lineIdx, charIdx)) return;
+    bufferText = lines[lineIdx].substr(charIdx, length);
+}
+
+void TextEditor::pasteText(size_t lineIdx, size_t charIdx) {
+    if (!areIndicesInRange(lineIdx, charIdx)) return;
+    lines[lineIdx].insert(charIdx, bufferText);
+}
+
+bool TextEditor::areIndicesInRange(size_t lineIdx, size_t charIdx) const {
+    if (lineIdx >= height) {
+        cout << "Line index out of bounds." << endl;
+        return false;
+    }
+
+    string &line = lines[lineIdx];
+    if(charIdx > line.length()) {
+        cout << "Char index out of bounds." << endl;
+        return false;
+    }
+    return true;
+}
+
+
+void TextEditor::loadLine(string &text) {
     if (height >= capacity) {
         reallocate(capacity *= 2);
     }
     lines[height] = text;
     height++;
+}
+
+void TextEditor::free() {
+    delete[] lines;
+    lines = new string[capacity];
+    height = 0;
 }
