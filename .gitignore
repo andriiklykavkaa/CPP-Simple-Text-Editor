@@ -1,0 +1,81 @@
+# === OS-Specific ===
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# === IDEs & Editors ===
+
+# CLion (JetBrains)
+.idea/
+cmake-build-*/
+*.iml
+
+# VS Code
+.vscode/
+
+# Code::Blocks
+*.depend
+*.layout
+*.cbp
+
+# Xcode
+*.xcworkspace/
+*.xcuserstate
+*.xcuserdatad/
+*.xcodeproj/
+
+# Sublime
+*.sublime-workspace
+*.sublime-project
+
+# === Build & Binary Files ===
+
+*.o
+*.obj
+*.lo
+*.la
+*.al
+*.libs
+*.so
+*.so.*
+*.a
+*.lib
+*.dll
+*.dylib
+*.exe
+*.out
+*.app
+*.stackdump
+*.gcda
+*.gcno
+*.gcov
+
+# === CMake ===
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+build/
+build*/  # handles build-debug, build-release, etc.
+
+# === Logs & Temp Files ===
+*.log
+*.tmp
+*.swp
+*.swo
+*~
+
+# === Coverage & Analysis ===
+*.gcov
+*.gcda
+*.gcno
+coverage/
+
+# === Other Files ===
+tags
