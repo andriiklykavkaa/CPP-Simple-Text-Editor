@@ -26,4 +26,6 @@ add_executable(TextEditorCPP src/main.cpp
         include/models/commands/PasteTextCommand.h
         src/models/commands/CutTextCommand.cpp
         src/models/commands/PasteTextCommand.cpp
+        include/models/commands/ReplaceTextCommand.h
+        src/models/commands/ReplaceTextCommand.cpp
 )

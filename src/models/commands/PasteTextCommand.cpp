@@ -11,8 +11,10 @@ editor(editor), lineIdx(lineIdx), charIdx(charIdx), text(move(text)) {}
 
 void PasteTextCommand::execute() {
     editor.insertText(lineIdx, charIdx, text);
+    editor.moveCursorCharIdx(text.length(), true);
 }
 
 void PasteTextCommand::undo() {
     editor.deleteText(lineIdx, charIdx, text.length());
+    editor.moveCursorCharIdx(text.length(), false);
 }
