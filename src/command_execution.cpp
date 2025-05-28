@@ -35,13 +35,15 @@ void showInstructions() {
     cout << "12 - paste text." << endl;
     cout << "13 - copy text." << endl;
     cout << "14 - replace." << endl;
-    cout << "15 - exit program." << endl;
+    cout << "15 - set cursor position." << endl;
+    cout << "16 - exit program." << endl;
 }
 
 void appendText(const AppContext &context) {
     string text;
     cout << "Enter text to append: ";
     getline(cin, text);
+
     context.manager.executeCommand(new AppendTextCommand(context.editor, text));
 }
 
@@ -64,31 +66,21 @@ void loadFile(const AppContext &context) {
 }
 
 void printText(const AppContext &context) {
-    context.editor.printBuffer();
+    context.editor.printCursorPos();
+    context.editor.printLines();
 }
 
 void insertByLineAndIndex(const AppContext &context) {
-    size_t lineIdx;
-    size_t charIdx;
-
-    while(true) {
-        cout << "Enter line index and char index: ";
-        cin >> lineIdx >> charIdx;
-
-        if (cin.fail()) {
-            cerr << "Invalid input. Please enter two integers." << endl;
-        } else {
-            break;
-        }
-    }
-
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
     string text;
     cout << "Enter text to insert: ";
     getline(cin, text);
 
-    context.manager.executeCommand(new InsertTextCommand(context.editor, lineIdx, charIdx, text));
+    context.manager.executeCommand(new InsertTextCommand(
+        context.editor,
+        context.editor.getCursorLineIdx(),
+        context.editor.getCursorCharIdx(),
+        text)
+        );
 }
 
 void searchText(const AppContext &context) {
@@ -99,12 +91,11 @@ void searchText(const AppContext &context) {
 }
 
 void deleteText(const AppContext &context) {
-    size_t lineIdx;
-    size_t charIdx;
+
     size_t length;
 
-    cout << "Enter line index, char index, length: ";
-    cin >> lineIdx >> charIdx >> length;
+    cout << "Enter length: ";
+    cin >> length;
 
     if (cin.fail()) {
         cerr << "Invalid input. Try again." << endl;
@@ -114,7 +105,11 @@ void deleteText(const AppContext &context) {
     }
 
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    context.manager.executeCommand(new DeleteTextCommand(context.editor, lineIdx, charIdx, length));
+    context.manager.executeCommand(new DeleteTextCommand(
+        context.editor,
+        context.editor.getCursorLineIdx(),
+        context.editor.getCursorCharIdx(),
+        length));
 }
 
 void undoCommand(const AppContext &context) {
@@ -126,12 +121,10 @@ void redoCommand(const AppContext &context) {
 }
 
 void cutText(const AppContext &context) {
-    size_t lineIdx;
-    size_t charIdx;
     size_t length;
 
-    cout << "Enter line index, char index, length: ";
-    cin >> lineIdx >> charIdx >> length;
+    cout << "Enter length: ";
+    cin >> length;
 
     if (cin.fail()) {
         cerr << "Invalid input. Try again." << endl;
@@ -142,37 +135,25 @@ void cutText(const AppContext &context) {
 
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-    string text = context.editor.getText(lineIdx, charIdx, length);
+    const size_t lineIdx = context.editor.getCursorLineIdx();
+    const size_t charIdx = context.editor.getCursorCharIdx();
+    const string text = context.editor.getText(lineIdx, charIdx, length);
+
     context.editor.setBufferText(text);
     context.manager.executeCommand(new CutTextCommand(context.editor, lineIdx, charIdx, text));
 }
 
 void pasteText(const AppContext &context) {
-    size_t lineIdx;
-    size_t charIdx;
-
-    cout << "Enter line index and char index: ";
-    cin >> lineIdx >> charIdx;
-
-    if (cin.fail()) {
-        cerr << "Invalid input. Try again." << endl;
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        return;
-    }
-
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
+    const size_t lineIdx = context.editor.getCursorLineIdx();
+    const size_t charIdx = context.editor.getCursorCharIdx();
     context.manager.executeCommand(new PasteTextCommand(context.editor, lineIdx, charIdx, context.editor.getBufferText()));
 }
 
 void copyText(const AppContext &context) {
-    size_t lineIdx;
-    size_t charIdx;
     size_t length;
 
-    cout << "Enter line index and char index: ";
-    cin >> lineIdx >> charIdx >> length;
+    cout << "Enter length: ";
+    cin >> length;
 
     if (cin.fail()) {
         cerr << "Invalid input. Try again." << endl;
@@ -183,30 +164,39 @@ void copyText(const AppContext &context) {
 
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
+    const size_t lineIdx = context.editor.getCursorLineIdx();
+    const size_t charIdx = context.editor.getCursorCharIdx();
     context.editor.copyText(lineIdx, charIdx, length);
 }
 
 void replaceText(const AppContext &context) {
-    size_t lineIdx;
-    size_t charIdx;
-
-    cout << "Enter line index and char index: ";
-    cin >> lineIdx >> charIdx;
-
-    if (cin.fail()) {
-        cerr << "Invalid input. Try again." << endl;
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        return;
-    }
-
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     string text;
     cout << "Enter text to replace to: ";
     getline(cin, text);
 
+    const size_t lineIdx = context.editor.getCursorLineIdx();
+    const size_t charIdx = context.editor.getCursorCharIdx();
+
     context.manager.executeCommand(new ReplaceTextCommand(context.editor, lineIdx, charIdx, text));
+}
+
+void setCursorPos(const AppContext &context) {
+    size_t lineIdx;
+    size_t charIdx;
+
+    cout << "Enter line index and char index: ";
+    cin >> lineIdx >> charIdx;
+
+    if (cin.fail()) {
+        cerr << "Invalid input. Try again." << endl;
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        return;
+    }
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    context.editor.setCursorPos(lineIdx, charIdx);
 }
 
 

@@ -45,7 +45,7 @@ void TextEditor::setBufferText(string text) {
     bufferText = move(text);
 }
 
-void TextEditor::printBuffer() const {
+void TextEditor::printLines() const {
     for (size_t i = 0; i < height; i++) {
         cout << lines[i]<< endl;
     }
@@ -178,6 +178,30 @@ void TextEditor::copyText(size_t lineIdx, size_t charIdx, size_t length) {
 void TextEditor::pasteText(size_t lineIdx, size_t charIdx) {
     if (!areIndicesInRange(lineIdx, charIdx)) return;
     lines[lineIdx].insert(charIdx, bufferText);
+}
+
+// ==== CURSOR ======
+
+size_t TextEditor::getCursorLineIdx() const {
+    return cursor.lineIdx;
+}
+
+size_t TextEditor::getCursorCharIdx() const {
+    return cursor.charIdx;
+}
+
+void TextEditor::moveCursorCharIdx(size_t length, const bool toRight) {
+    cursor.moveCharIdx(length, toRight);
+}
+
+void TextEditor::setCursorPos(size_t lineIdx, size_t charIdx) {
+    if (!areIndicesInRange(lineIdx, charIdx)) return;
+    cursor.lineIdx = lineIdx;
+    cursor.charIdx = charIdx;
+}
+
+void TextEditor::printCursorPos() const {
+    cout << "Cursor position: " << cursor.getString() << endl;
 }
 
 bool TextEditor::areIndicesInRange(size_t lineIdx, size_t charIdx) const {

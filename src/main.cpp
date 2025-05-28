@@ -20,8 +20,9 @@ enum CommandType {
     paste = 12,
     duplicate = 13,
     interchange = 14,
-    finish = 15,
-    COUNT = 16
+    cursor = 15,
+    finish = 16,
+    COUNT = 17
 };
 
 void handleCommand(AppContext &context, CommandType command) {
@@ -70,6 +71,9 @@ void handleCommand(AppContext &context, CommandType command) {
             break;
         case interchange:
             replaceText(context);
+            break;
+        case cursor:
+            setCursorPos(context);
             break;
         case finish:
             exitProgram();
