@@ -20,6 +20,7 @@ void redoCommand(const AppContext &context);
 void cutText(const AppContext &context);
 void pasteText(const AppContext &context);
 void copyText(const AppContext &context);
+void replaceText(const AppContext &context);
 void exitProgram();
 
 #endif //COMMANDS_H

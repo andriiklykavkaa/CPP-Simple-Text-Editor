@@ -14,6 +14,7 @@
 #include "../include/models/commands/DeleteTextCommand.h"
 #include "../include/models/commands/InsertTextCommand.h"
 #include "../include/models/commands/PasteTextCommand.h"
+#include "../include/models/commands/ReplaceTextCommand.h"
 
 using namespace std;
 
@@ -184,6 +185,30 @@ void copyText(const AppContext &context) {
 
     context.editor.copyText(lineIdx, charIdx, length);
 }
+
+void replaceText(const AppContext &context) {
+    size_t lineIdx;
+    size_t charIdx;
+
+    cout << "Enter line index and char index: ";
+    cin >> lineIdx >> charIdx;
+
+    if (cin.fail()) {
+        cerr << "Invalid input. Try again." << endl;
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        return;
+    }
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    string text;
+    cout << "Enter text to replace to: ";
+    getline(cin, text);
+
+    context.manager.executeCommand(new ReplaceTextCommand(context.editor, lineIdx, charIdx, text));
+}
+
 
 void exitProgram() {
     cout << "Ending program..." << endl;

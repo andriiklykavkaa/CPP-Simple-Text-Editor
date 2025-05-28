@@ -69,7 +69,7 @@ void handleCommand(AppContext &context, CommandType command) {
             copyText(context);
             break;
         case interchange:
-
+            replaceText(context);
             break;
         case finish:
             exitProgram();

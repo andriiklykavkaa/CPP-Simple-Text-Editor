@@ -36,6 +36,7 @@ public:
     void cutText(size_t line_idx, size_t char_idx, size_t length);
     void copyText(size_t line_idx, size_t char_idx, size_t length);
     void pasteText(size_t line_idx, size_t char_idx);
+    void replaceText(size_t line_idx, size_t char_idx, string& text);
 
     [[nodiscard]] bool areIndicesInRange(size_t line_idx, size_t char_idx) const;
     string getText(size_t lineIdx, size_t charIdx, size_t length); // support
