@@ -15,6 +15,6 @@ void InsertTextCommand::execute() {
 
 void InsertTextCommand::undo() {
     editor.deleteText(lineIdx, charIdx, text.length());
-    editor.moveCursorCharIdx(-text.length(), false);
+    editor.moveCursorCharIdx(text.length(), false);
 }
 
