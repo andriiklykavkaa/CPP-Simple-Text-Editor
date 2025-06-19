@@ -5,18 +5,16 @@
 #ifndef CONTACTLINE_H
 #define CONTACTLINE_H
 
-#include "../abstract/Line.h"
+#include "../abstract/Readable.h"
 
-class ContactLine : public ILine<std::tuple<std::string, std::string>> {
-private:
-    std::string name;
-    std::string email;
-public:
-    explicit ContactLine(std::string name, std::string email) : name{move(name)}, email{move(email)} {};
-    std::tuple<std::string, std::string> get_data() override;
-    void set_data(std::tuple<std::string, std::string> contact_info) override;
-    std::string to_string() override;
-};
+// class ContactLine : public IReadable {
+// private:
+//     std::string name;
+//     std::string email;
+// public:
+//     explicit ContactLine(std::string name, std::string email) : name{std::move(name)}, email{std::move(email)} {};
+//     [[nodiscard]] std::string display() const override;
+// };
 
 
 #endif //CONTACTLINE_H

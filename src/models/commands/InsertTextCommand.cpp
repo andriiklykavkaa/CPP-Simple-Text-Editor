@@ -5,16 +5,16 @@
 #include "../../../include/models/commands/InsertTextCommand.h"
 #include "../../../include/models/TextEditor.h"
 
-InsertTextCommand::InsertTextCommand(TextEditor &editor, size_t lineIdx, size_t charIdx, string text) :
-editor(editor), lineIdx(lineIdx), charIdx(charIdx), text(move(text)) {}
+InsertTextCommand::InsertTextCommand(TextEditor &editor, const IndexTuple pos, string &text) :
+editor(editor), text(move(text)), pos(pos) {}
 
 void InsertTextCommand::execute() {
-    editor.insertText(lineIdx, charIdx, text);
+    editor.insertText(pos, text);
     editor.moveCursorCharIdx(text.length(), true);
 }
 
 void InsertTextCommand::undo() {
-    editor.deleteText(lineIdx, charIdx, text.length());
+    editor.deleteText(pos, text.length());
     editor.moveCursorCharIdx(text.length(), false);
 }
 

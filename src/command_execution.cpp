@@ -77,8 +77,7 @@ void insertByLineAndIndex(const AppContext &context) {
 
     context.manager.executeCommand(new InsertTextCommand(
         context.editor,
-        context.editor.getCursorLineIdx(),
-        context.editor.getCursorCharIdx(),
+        context.editor.getCursorPos(),
         text)
         );
 }
@@ -107,8 +106,7 @@ void deleteText(const AppContext &context) {
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     context.manager.executeCommand(new DeleteTextCommand(
         context.editor,
-        context.editor.getCursorLineIdx(),
-        context.editor.getCursorCharIdx(),
+        context.editor.getCursorPos(),
         length));
 }
 
@@ -135,18 +133,16 @@ void cutText(const AppContext &context) {
 
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-    const size_t lineIdx = context.editor.getCursorLineIdx();
-    const size_t charIdx = context.editor.getCursorCharIdx();
-    const string text = context.editor.getText(lineIdx, charIdx, length);
+    const IndexTuple pos = context.editor.getCursorPos();
+    std::string text = context.editor.getText(pos, length);
 
     context.editor.setBufferText(text);
-    context.manager.executeCommand(new CutTextCommand(context.editor, lineIdx, charIdx, text));
+    context.manager.executeCommand(new CutTextCommand(context.editor, pos, text));
 }
 
 void pasteText(const AppContext &context) {
-    const size_t lineIdx = context.editor.getCursorLineIdx();
-    const size_t charIdx = context.editor.getCursorCharIdx();
-    context.manager.executeCommand(new PasteTextCommand(context.editor, lineIdx, charIdx, context.editor.getBufferText()));
+    const IndexTuple pos = context.editor.getCursorPos();
+    context.manager.executeCommand(new PasteTextCommand(context.editor, pos, context.editor.getBufferText()));
 }
 
 void copyText(const AppContext &context) {
@@ -164,9 +160,8 @@ void copyText(const AppContext &context) {
 
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-    const size_t lineIdx = context.editor.getCursorLineIdx();
-    const size_t charIdx = context.editor.getCursorCharIdx();
-    context.editor.copyText(lineIdx, charIdx, length);
+    const IndexTuple pos = context.editor.getCursorPos();
+    context.editor.copyText(pos, length);
 }
 
 void replaceText(const AppContext &context) {
@@ -175,18 +170,17 @@ void replaceText(const AppContext &context) {
     cout << "Enter text to replace to: ";
     getline(cin, text);
 
-    const size_t lineIdx = context.editor.getCursorLineIdx();
-    const size_t charIdx = context.editor.getCursorCharIdx();
+    const IndexTuple pos = context.editor.getCursorPos();
 
-    context.manager.executeCommand(new ReplaceTextCommand(context.editor, lineIdx, charIdx, text));
+    context.manager.executeCommand(new ReplaceTextCommand(context.editor, pos, text));
 }
 
 void setCursorPos(const AppContext &context) {
-    size_t lineIdx;
-    size_t charIdx;
 
+    IndexTuple pos;
     cout << "Enter line index and char index: ";
-    cin >> lineIdx >> charIdx;
+    cin >> pos.line_idx >> pos.char_idx;
+
 
     if (cin.fail()) {
         cerr << "Invalid input. Try again." << endl;
@@ -196,7 +190,7 @@ void setCursorPos(const AppContext &context) {
     }
 
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    context.editor.setCursorPos(lineIdx, charIdx);
+    context.editor.setCursorPos(pos);
 }
 
 

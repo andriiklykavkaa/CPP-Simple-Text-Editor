@@ -11,12 +11,11 @@
 class PasteTextCommand: public ICommand {
 private:
     TextEditor &editor;
+    IndexTuple pos;
     string text;
-    size_t lineIdx;
-    size_t charIdx;
 
 public:
-    PasteTextCommand(TextEditor &editor, size_t lineIdx, size_t charIdx, string text);
+    PasteTextCommand(TextEditor &editor, IndexTuple pos, string &text);
     void execute() override;
     void undo() override;
 };

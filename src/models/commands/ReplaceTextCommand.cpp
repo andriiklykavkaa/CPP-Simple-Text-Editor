@@ -8,16 +8,16 @@
 #include "../../../include/models/commands/ReplaceTextCommand.h"
 #include "../../../include/models/TextEditor.h"
 
-ReplaceTextCommand::ReplaceTextCommand(TextEditor &editor, size_t lineIdx, size_t charIdx, string text) :
-editor(editor), lineIdx(lineIdx), charIdx(charIdx), insertedText(move(text)) {}
+ReplaceTextCommand::ReplaceTextCommand(TextEditor &editor, IndexTuple pos, string text) :
+editor(editor), pos(pos), insertedText(std::move(text)) {}
 
 void ReplaceTextCommand::execute() {
-    deletedText = editor.getText(lineIdx, charIdx, insertedText.length());
-    editor.deleteText(lineIdx, charIdx, insertedText.length());
-    editor.insertText(lineIdx, charIdx, insertedText);
+    deletedText = editor.getText(pos, insertedText.length());
+    editor.deleteText(pos, insertedText.length());
+    editor.insertText(pos, insertedText);
 }
 
 void ReplaceTextCommand::undo() {
-    editor.deleteText(lineIdx, charIdx, deletedText.length());
-    editor.insertText(lineIdx, charIdx, deletedText);
+    editor.deleteText(pos, deletedText.length());
+    editor.insertText(pos, deletedText);
 }

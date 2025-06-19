@@ -12,11 +12,10 @@ class InsertTextCommand: public ICommand {
 private:
     TextEditor &editor;
     string text;
-    size_t lineIdx;
-    size_t charIdx;
+    IndexTuple pos;
 
 public:
-    InsertTextCommand(TextEditor &editor, size_t lineIdx, size_t charIdx, string text);
+    InsertTextCommand(TextEditor &editor, IndexTuple pos, string &text);
 
     void execute() override;
     void undo() override;

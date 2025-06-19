@@ -5,11 +5,16 @@
 #include <iostream>
 #include <string>
 #include "../../include/models/TextEditor.h"
+#include "../../include/models//utility/IndexTuple.h"
+
 
 using namespace std;
 
+TextEditor::TextEditor(size_t capacity):
+lines(new TextLine[capacity]), height(1), capacity(capacity) {}
+
 void TextEditor::reallocate(size_t newCapacity) {
-    auto* newLines = new string[newCapacity];
+    auto* newLines = new TextLine[newCapacity];
     for (size_t i = 0; i < height; i++) {
         newLines[i] = lines[i];
     }
@@ -18,14 +23,11 @@ void TextEditor::reallocate(size_t newCapacity) {
     capacity = newCapacity;
 }
 
-TextEditor::TextEditor(size_t capacity):
-lines(new string[capacity]), height(1), capacity(capacity) {}
-
 TextEditor::~TextEditor() {
     delete[] lines;
 }
 
-string* TextEditor::getLines() const {
+TextLine* TextEditor::getLines() const {
     return lines;
 }
 
@@ -37,22 +39,22 @@ size_t TextEditor::getCapacity() const {
     return capacity;
 }
 
-string TextEditor::getBufferText() const {
+string& TextEditor::getBufferText() {
     return bufferText;
 }
 
-void TextEditor::setBufferText(string text) {
-    bufferText = move(text);
+void TextEditor::setBufferText(string &text) {
+    bufferText = std::move(text);
 }
 
 void TextEditor::printLines() const {
     for (size_t i = 0; i < height; i++) {
-        cout << lines[i]<< endl;
+        cout << lines[i].display() << endl;
     }
 }
 
 void TextEditor::appendText(const string &text) const {
-    lines[height-1].append(text);
+    lines[height-1].append_text(text);
 }
 
 void TextEditor::addLine() {
@@ -62,173 +64,77 @@ void TextEditor::addLine() {
     height++;
 }
 
-void TextEditor::deleteLine(size_t lineIdx) {
+void TextEditor::deleteLine(const size_t lineIdx) {
     for (size_t i = lineIdx; i < height - 1; i++) {
         lines[i] = lines[i+1];
     }
     --height;
 }
 
-void TextEditor::insertText(size_t lineIdx, size_t charIdx, const string &text) const {
-    if (!areIndicesInRange(lineIdx, charIdx)) return;
-    lines[lineIdx].insert(charIdx, text);
+void TextEditor::insertText(const IndexTuple pos, const string &text) const {
+    lines[pos.line_idx].insert_text(pos.char_idx, text);
 }
 
-class IndexTuple {
-private:
-    size_t lineIdx;
-    size_t charIdx;
-
-public:
-    IndexTuple(size_t aLineIdx, size_t aCharIdx) :
-    lineIdx(aLineIdx), charIdx(aCharIdx) {}
-
-    IndexTuple():
-    lineIdx(0), charIdx(0) {}
-
-    ~IndexTuple() = default;
-
-    [[nodiscard]] string getString() const {
-        return "(" + to_string(lineIdx) + ", " + to_string(charIdx) + ")";
-    }
-};
-
-class SearchResult {
-private:
-    IndexTuple *tuples;
-    size_t size;
-    size_t capacity;
-
-    void reallocate(size_t newCapacity) {
-        auto newTuples = new IndexTuple[newCapacity];
-        for (int i = 0; i < size; ++i) {
-            newTuples[i] = tuples[i];
-        }
-        delete[] tuples;
-        tuples = newTuples;
-        capacity = newCapacity;
-    }
-
-public:
-    explicit SearchResult(size_t capacity):
-    tuples(new IndexTuple[capacity]), size(0), capacity(capacity) {
-        if (capacity <= 0 ) {
-            cerr << "Error initializing SearchResult. Capacity must be positive" << endl;
-            return;
-        }
-    }
-
-    ~SearchResult() {
-        delete[] tuples;
-    }
-
-    void add(const IndexTuple &tuple) {
-        if (size >= capacity) {
-            reallocate(capacity *= 2);
-        }
-        tuples[size] = tuple;
-        ++size;
-    }
-
-    void print() const {
-        for (int i = 0; i < size; ++i) {
-            cout << tuples[i].getString() << " ";
-        }
-    }
-};
-
 void TextEditor::search(const string &text) const {
-    SearchResult result(8);
-
-    size_t pos = 0;
-    for (size_t i = 0; i < height; i++) {
-        while ((pos = lines[i].find(text, pos)) != string::npos) {
-            result.add(IndexTuple(i, pos));
-            pos += text.length();
-        }
-        pos = 0;
-    }
-
     cout << "Found at positions: ";
-    result.print();
+    for (size_t i = 0; i < height; i++) {
+        lines[i].search(i, text);
+    }
     cout << endl;
 }
 
-string TextEditor::getText(size_t lineIdx, size_t charIdx, size_t length) {
-    if (!areIndicesInRange(lineIdx, charIdx)) return NULL;
-    return lines[lineIdx].substr(charIdx, length);
+string TextEditor::getText(const IndexTuple pos, const size_t length) const {
+    return lines[pos.line_idx].get_text(pos.char_idx, length);
 }
 
-void TextEditor::deleteText(size_t lineIdx, size_t charIdx, size_t length) {
-    if (!areIndicesInRange(lineIdx, charIdx)) return;
-    lines[lineIdx].erase(charIdx, length);
+void TextEditor::deleteText(const IndexTuple pos, const size_t length) const {
+    lines[pos.line_idx].delete_text(pos.char_idx, length);
 }
 
-void TextEditor::cutText(size_t lineIdx, size_t charIdx, size_t length) {
-    if (!areIndicesInRange(lineIdx, charIdx)) return;
-    bufferText = lines[lineIdx].substr(charIdx, length);
-    lines[lineIdx].erase(charIdx, length);
+void TextEditor::cutText(const IndexTuple pos, const size_t length) {
+    lines[pos.line_idx].cut_text(pos.line_idx, length, bufferText);
 }
 
-void TextEditor::copyText(size_t lineIdx, size_t charIdx, size_t length) {
-    if (!areIndicesInRange(lineIdx, charIdx)) return;
-    bufferText = lines[lineIdx].substr(charIdx, length);
+void TextEditor::copyText(const IndexTuple pos, const size_t length) {
+    lines[pos.line_idx].copy_text(pos.char_idx, length, bufferText);
 }
 
-void TextEditor::pasteText(size_t lineIdx, size_t charIdx) {
-    if (!areIndicesInRange(lineIdx, charIdx)) return;
-    lines[lineIdx].insert(charIdx, bufferText);
+void TextEditor::pasteText(const IndexTuple pos) const {
+    lines[pos.line_idx].paste_text(pos.char_idx, bufferText);
 }
 
 // ==== CURSOR ======
 
-size_t TextEditor::getCursorLineIdx() const {
-    return cursor.lineIdx;
+
+IndexTuple TextEditor::getCursorPos() const {
+    return cursor.pos;
 }
 
-size_t TextEditor::getCursorCharIdx() const {
-    return cursor.charIdx;
-}
-
-void TextEditor::moveCursorCharIdx(size_t length, const bool toRight) {
+void TextEditor::moveCursorCharIdx(const size_t length, const bool toRight) {
     cursor.moveCharIdx(length, toRight);
 }
 
-void TextEditor::setCursorPos(size_t lineIdx, size_t charIdx) {
-    if (!areIndicesInRange(lineIdx, charIdx)) return;
-    cursor.lineIdx = lineIdx;
-    cursor.charIdx = charIdx;
+void TextEditor::setCursorPos(const IndexTuple pos) {
+    if (!(pos.line_idx < height && pos.char_idx < lines[pos.line_idx].get_length()))
+        return;
+    cursor.pos.line_idx = pos.line_idx;
+    cursor.pos.char_idx = pos.char_idx;
 }
 
 void TextEditor::printCursorPos() const {
-    cout << "Cursor position: " << cursor.getString() << endl;
+    cout << "Cursor position: " << cursor.display() << endl;
 }
-
-bool TextEditor::areIndicesInRange(size_t lineIdx, size_t charIdx) const {
-    if (lineIdx >= height) {
-        cout << "Line index out of bounds." << endl;
-        return false;
-    }
-
-    string &line = lines[lineIdx];
-    if(charIdx > line.length()) {
-        cout << "Char index out of bounds." << endl;
-        return false;
-    }
-    return true;
-}
-
 
 void TextEditor::loadLine(string &text) {
     if (height >= capacity) {
         reallocate(capacity *= 2);
     }
-    lines[height] = text;
+    lines[height].load_data(text);
     height++;
 }
 
 void TextEditor::free() {
     delete[] lines;
-    lines = new string[capacity];
+    lines = new TextLine[capacity];
     height = 0;
 }

@@ -28,11 +28,13 @@ add_executable(TextEditorCPP src/main.cpp
         src/models/commands/PasteTextCommand.cpp
         include/models/commands/ReplaceTextCommand.h
         src/models/commands/ReplaceTextCommand.cpp
-        include/models/abstract/Line.h
+        include/models/abstract/Readable.h
         src/models/lines/TextLine.cpp
         include/models/lines/TextLine.h
         src/models/lines/ContactLine.cpp
         include/models/lines/ContactLine.h
         include/models/lines/CheckboxLine.h
         src/models/lines/CheckboxLine.cpp
+        include/models/utility/IndexTuple.h
+        include/models/abstract/Traversable.h
 )

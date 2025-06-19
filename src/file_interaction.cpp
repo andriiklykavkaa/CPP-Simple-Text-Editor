@@ -7,6 +7,8 @@
 
 #include "../include/file_interaction.h"
 #include "../include/models/TextEditor.h"
+#include "../include/models/lines/TextLine.h"
+
 
 using namespace std;
 
@@ -18,9 +20,9 @@ void writeBufferToFile(const TextEditor &editor, const string &path) {
     }
 
     const size_t bufHeight = editor.getHeight();
-    const string *lines = editor.getLines();
+    const TextLine *lines = editor.getLines();
     for (int i = 0; i < bufHeight; ++i) {
-        file << lines[i] << "\n";
+        file << lines[i].display() << "\n";
     }
     file.close();
     cout << "File is successfully written." << endl;

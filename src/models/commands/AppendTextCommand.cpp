@@ -6,14 +6,15 @@
 #include "../../../include/models/TextEditor.h"
 
 AppendTextCommand::AppendTextCommand(TextEditor &editor, string text) :
-editor(editor), text(move(text)) {}
+editor(editor), text(std::move(text)) {
+    pos.line_idx = editor.getHeight() - 1;
+    pos.char_idx = editor.getLines()[pos.line_idx].get_length();
+}
 
 void AppendTextCommand::execute() {
         editor.appendText(text);
-    }
+}
 
 void AppendTextCommand::undo() {
-    const size_t bufHeight = editor.getHeight();
-    const string *line = &editor.getLines()[bufHeight-1];
-    editor.deleteText(bufHeight-1, line->length() - text.size(), text.size());
+    editor.deleteText(pos, text.size());
 }

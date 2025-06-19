@@ -6,35 +6,37 @@
 #define BUFFER_H
 #include <string>
 
+#include "lines/TextLine.h"
+#include "utility/IndexTuple.h"
+
+
 using namespace std;
 
 class TextEditor {
 private:
 
-    struct Cursor {
-        size_t lineIdx = 0;
-        size_t charIdx = 0;
+    TextLine* lines;
+    size_t height;
+    size_t capacity;
+    std::string bufferText;
 
-        void set(size_t line, size_t ch) {
-            lineIdx = line;
-            charIdx = ch;
+    struct Cursor {
+        IndexTuple pos;
+
+        void set(IndexTuple pos) {
+            this->pos = pos;
         }
 
         void moveCharIdx(const size_t length, const bool toRight) {
-            charIdx += (toRight) ? length : -length;
+            pos.char_idx += (toRight) ? length : -length;
         }
 
-        string getString() const {
-            return "(" + to_string(lineIdx) + ", " + to_string(charIdx) + ")";
+        string display() const {
+            return "(" + to_string(pos.line_idx) + ", " + to_string(pos.char_idx) + ")";
         }
     };
 
     Cursor cursor;
-
-    string* lines;
-    size_t height;
-    size_t capacity;
-    string bufferText;
 
     void reallocate(size_t newCapacity);
 
@@ -42,32 +44,30 @@ public:
     explicit TextEditor(size_t capacity);
     ~TextEditor();
 
-    [[nodiscard]] string* getLines() const;
+    [[nodiscard]] TextLine* getLines() const;
     [[nodiscard]] size_t getHeight() const;
     [[nodiscard]] size_t getCapacity() const;
-    [[nodiscard]] string getBufferText() const;
-    void setBufferText(string text);
+    [[nodiscard]] string &getBufferText();
+    void setBufferText(string &text);
 
-    size_t getCursorLineIdx() const;
-    size_t getCursorCharIdx() const;
+    [[nodiscard]] IndexTuple getCursorPos() const;
     void moveCursorCharIdx(size_t length, bool toRight);
     void printCursorPos() const;
-    void setCursorPos(size_t lineIdx, size_t charIdx);
+    void setCursorPos(IndexTuple pos);
 
-    void printLines() const; // No need
-    void appendText(const string& text) const; // DONE
-    void addLine(); // DONE
-    void insertText(size_t line_idx, size_t char_idx, const string& text) const; // DONE
-    void search(const string &text) const; // No need
-    void deleteText(size_t line_idx, size_t char_idx, size_t length); // DONE
-    void cutText(size_t line_idx, size_t char_idx, size_t length);
-    void copyText(size_t line_idx, size_t char_idx, size_t length);
-    void pasteText(size_t line_idx, size_t char_idx);
+    void printLines() const;
+    void appendText(const string& text) const;
+    void addLine();
+    void insertText(IndexTuple pos, const string& text) const;
+    void search(const string &text) const;
+    void deleteText(IndexTuple pos, size_t length) const;
+    [[nodiscard]] std::string getText(IndexTuple pos, size_t length) const;
+    void cutText(IndexTuple pos, size_t length);
+    void copyText(IndexTuple pos, size_t length);
+    void pasteText(IndexTuple pos) const;
 
-    [[nodiscard]] bool areIndicesInRange(size_t line_idx, size_t char_idx) const;
-    string getText(size_t lineIdx, size_t charIdx, size_t length); // support
-    void deleteLine(size_t lineIdx); // support
-    void loadLine(string &text); // support
+    void deleteLine(size_t lineIdx);
+    void loadLine(string &text);
     void free();
 
     TextEditor(const TextEditor&) = delete;

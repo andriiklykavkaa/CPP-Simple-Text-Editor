@@ -6,15 +6,15 @@
 #include "../../../include/models/TextEditor.h"
 
 
-CutTextCommand::CutTextCommand(TextEditor &editor, size_t lineIdx, size_t charIdx, string text) :
-editor(editor), lineIdx(lineIdx), charIdx(charIdx), text(move(text)) {}
+CutTextCommand::CutTextCommand(TextEditor &editor, IndexTuple pos, string text) :
+editor(editor), pos(pos), text(move(text)) {}
 
 void CutTextCommand::execute() {
-    editor.deleteText(lineIdx, charIdx, text.length());
+    editor.deleteText(pos, text.length());
     editor.moveCursorCharIdx(text.length(), false);
 }
 
 void CutTextCommand::undo() {
-    editor.insertText(lineIdx, charIdx, text);
+    editor.insertText(pos, text);
     editor.moveCursorCharIdx(text.length(), true);
 }
