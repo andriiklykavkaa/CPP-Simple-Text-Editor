@@ -12,9 +12,9 @@ private:
     std::string text;
     bool isDone;
 public:
-    explicit CheckboxLine(std::string text) : text{move(text)}, isDone{false} {};
+    explicit CheckboxLine(std::string text) : text{move(text)}, isDone{std::move(isDone)} {};
     std::tuple<std::string, bool> get_data() override;
-    void set_data(std::tuple<std::string, bool> checkbox_info) override;
+    void set_data(std::tuple<std::string, bool> contact_info) override;
     std::string to_string() override;
 };
 

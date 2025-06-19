@@ -16,7 +16,8 @@ void ContactLine::set_data(std::tuple<std::string, std::string> contact_info) {
 }
 
 std::string ContactLine::to_string() {
-    return std::format('Name: {}. Email: {}', name, email);
+    // return std::format('Name: {}. Email: {}', name, email);
+    return "";
 }
 
 
