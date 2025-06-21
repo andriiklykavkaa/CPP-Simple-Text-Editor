@@ -4,107 +4,94 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include "../../include/models/TextEditor.h"
 #include "../../include/models//utility/IndexTuple.h"
 
-
-using namespace std;
-
-TextEditor::TextEditor(size_t capacity):
-lines(new TextLine[capacity]), height(1), capacity(capacity) {}
-
-void TextEditor::reallocate(size_t newCapacity) {
-    auto* newLines = new TextLine[newCapacity];
-    for (size_t i = 0; i < height; i++) {
-        newLines[i] = lines[i];
-    }
-    delete[] lines;
-    lines = newLines;
-    capacity = newCapacity;
+TextEditor::TextEditor() {
+    TextLine* l = new TextLine();
+    lines.push_back(l);
 }
 
 TextEditor::~TextEditor() {
-    delete[] lines;
+    for(TextLine* l : lines)
+        delete l;
 }
 
-TextLine* TextEditor::getLines() const {
+std::vector<TextLine*> TextEditor::getLines() const {
     return lines;
 }
 
 size_t TextEditor::getHeight() const {
-    return height;
+    return lines.size();
 }
 
-size_t TextEditor::getCapacity() const {
-    return capacity;
-}
 
-string& TextEditor::getBufferText() {
+std::string& TextEditor::getBufferText() {
     return bufferText;
 }
 
-void TextEditor::setBufferText(string &text) {
+void TextEditor::setBufferText(std::string &text) {
     bufferText = std::move(text);
 }
 
 void TextEditor::printLines() const {
+    size_t height = getHeight();
     for (size_t i = 0; i < height; i++) {
-        cout << lines[i].display() << endl;
+        std::cout << lines.at(i)->display() << std::endl;
     }
 }
 
-void TextEditor::appendText(const string &text) const {
-    lines[height-1].append_text(text);
+void TextEditor::appendText(const std::string &text) const {
+    lines.back()->append_text(text);
 }
 
 void TextEditor::addLine() {
-    if (height >= capacity) {
-        reallocate(capacity * 2);
-    }
-    height++;
+    lines.push_back(new TextLine());
 }
 
 void TextEditor::deleteLine(const size_t lineIdx) {
-    for (size_t i = lineIdx; i < height - 1; i++) {
-        lines[i] = lines[i+1];
+    if (lineIdx < lines.size()) {
+        delete lines.at(lineIdx);
+        lines.erase(lines.begin() + static_cast<unsigned long>(lineIdx));
     }
-    --height;
+
 }
 
-void TextEditor::insertText(const IndexTuple pos, const string &text) const {
-    lines[pos.line_idx].insert_text(pos.char_idx, text);
+void TextEditor::insertText(const IndexTuple pos, const std::string &text) const {
+    lines.at(pos.line_idx)->insert_text(pos.char_idx, text);
 }
 
-void TextEditor::search(const string &text) const {
-    cout << "Found at positions: ";
+void TextEditor::search(const std::string &text) const {
+    size_t height = lines.size();
+    std::cout << "Found at positions: ";
     for (size_t i = 0; i < height; i++) {
-        lines[i].search(i, text);
+        lines.at(i)->search(i, text);
     }
-    cout << endl;
+    std::cout << std::endl;
 }
 
-string TextEditor::getText(const IndexTuple pos, const size_t length) const {
-    return lines[pos.line_idx].get_text(pos.char_idx, length);
+std::string TextEditor::getText(const IndexTuple pos, const size_t length) const {
+    return lines.at(pos.line_idx)->get_text(pos.char_idx, length);
 }
 
 void TextEditor::deleteText(const IndexTuple pos, const size_t length) const {
-    lines[pos.line_idx].delete_text(pos.char_idx, length);
+    lines.at(pos.line_idx)->delete_text(pos.char_idx, length);
 }
 
-void TextEditor::cutText(const IndexTuple pos, const size_t length) {
-    lines[pos.line_idx].cut_text(pos.line_idx, length, bufferText);
-}
+// void TextEditor::cutText(const IndexTuple pos, const size_t length) {
+//     lines.at(pos.line_idx)->cut_text(pos.line_idx, length, bufferText);
+// }
 
 void TextEditor::copyText(const IndexTuple pos, const size_t length) {
-    lines[pos.line_idx].copy_text(pos.char_idx, length, bufferText);
+    lines.at(pos.line_idx)->copy_text(pos.char_idx, length, bufferText);
 }
 
-void TextEditor::pasteText(const IndexTuple pos) const {
-    lines[pos.line_idx].paste_text(pos.char_idx, bufferText);
-}
+// void TextEditor::pasteText(const IndexTuple pos) const {
+//     lines.at(pos.line_idx)->paste_text(pos.char_idx, bufferText);
+// }
 
 // ==== CURSOR ======
-
 
 IndexTuple TextEditor::getCursorPos() const {
     return cursor.pos;
@@ -115,26 +102,25 @@ void TextEditor::moveCursorCharIdx(const size_t length, const bool toRight) {
 }
 
 void TextEditor::setCursorPos(const IndexTuple pos) {
-    if (!(pos.line_idx < height && pos.char_idx < lines[pos.line_idx].get_length()))
+    size_t height = lines.size();;
+    if (!(pos.line_idx < height && pos.char_idx < lines.at(pos.line_idx)->get_length()))
         return;
     cursor.pos.line_idx = pos.line_idx;
     cursor.pos.char_idx = pos.char_idx;
 }
 
 void TextEditor::printCursorPos() const {
-    cout << "Cursor position: " << cursor.display() << endl;
+    std::cout << "Cursor position: " << cursor.display() << std::endl;
 }
 
-void TextEditor::loadLine(string &text) {
-    if (height >= capacity) {
-        reallocate(capacity *= 2);
-    }
-    lines[height].load_data(text);
-    height++;
+void TextEditor::loadLine(std::string &text) {
+    TextLine* l = static_cast<TextLine *>(malloc(sizeof(TextLine)));
+    l->load_data(text);
+    lines.push_back(l);
 }
 
 void TextEditor::free() {
-    delete[] lines;
-    lines = new TextLine[capacity];
-    height = 0;
+    for(TextLine *l : lines)
+        delete l;
+    lines.clear();
 }

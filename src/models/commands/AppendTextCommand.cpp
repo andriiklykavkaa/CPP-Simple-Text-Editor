@@ -8,7 +8,7 @@
 AppendTextCommand::AppendTextCommand(TextEditor &editor, string text) :
 editor(editor), text(std::move(text)) {
     pos.line_idx = editor.getHeight() - 1;
-    pos.char_idx = editor.getLines()[pos.line_idx].get_length();
+    pos.char_idx = editor.getLines().at(pos.line_idx)->get_length();
 }
 
 void AppendTextCommand::execute() {

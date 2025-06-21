@@ -11,10 +11,10 @@ editor(editor), pos(pos), length(length) {}
 void DeleteTextCommand::execute() {
     deletedText = editor.getText(pos, length);
     editor.deleteText(pos, length);
-    editor.moveCursorCharIdx(length, false);
+    // editor.moveCursorCharIdx(length, false);
 }
 
 void DeleteTextCommand::undo() {
     editor.insertText(pos, deletedText);
-    editor.moveCursorCharIdx(deletedText.length(), true);
+    // editor.moveCursorCharIdx(deletedText.length(), true);
 }

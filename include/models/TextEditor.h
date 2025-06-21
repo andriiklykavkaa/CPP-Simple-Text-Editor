@@ -5,19 +5,16 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 #include <string>
+#include <vector>
 
 #include "lines/TextLine.h"
 #include "utility/IndexTuple.h"
 
 
-using namespace std;
-
 class TextEditor {
 private:
 
-    TextLine* lines;
-    size_t height;
-    size_t capacity;
+    std::vector<TextLine*> lines;
     std::string bufferText;
 
     struct Cursor {
@@ -31,24 +28,21 @@ private:
             pos.char_idx += (toRight) ? length : -length;
         }
 
-        string display() const {
-            return "(" + to_string(pos.line_idx) + ", " + to_string(pos.char_idx) + ")";
+        std::string display() const {
+            return "(" + std::to_string(pos.line_idx) + ", " + std::to_string(pos.char_idx) + ")";
         }
     };
 
-    Cursor cursor;
-
-    void reallocate(size_t newCapacity);
+    Cursor cursor{};
 
 public:
-    explicit TextEditor(size_t capacity);
+    explicit TextEditor();
     ~TextEditor();
 
-    [[nodiscard]] TextLine* getLines() const;
+    [[nodiscard]] std::vector<TextLine*> getLines() const;
     [[nodiscard]] size_t getHeight() const;
-    [[nodiscard]] size_t getCapacity() const;
-    [[nodiscard]] string &getBufferText();
-    void setBufferText(string &text);
+    [[nodiscard]] std::string &getBufferText();
+    void setBufferText(std::string &text);
 
     [[nodiscard]] IndexTuple getCursorPos() const;
     void moveCursorCharIdx(size_t length, bool toRight);
@@ -56,10 +50,10 @@ public:
     void setCursorPos(IndexTuple pos);
 
     void printLines() const;
-    void appendText(const string& text) const;
+    void appendText(const std::string& text) const;
     void addLine();
-    void insertText(IndexTuple pos, const string& text) const;
-    void search(const string &text) const;
+    void insertText(IndexTuple pos, const std::string& text) const;
+    void search(const std::string &text) const;
     void deleteText(IndexTuple pos, size_t length) const;
     [[nodiscard]] std::string getText(IndexTuple pos, size_t length) const;
     void cutText(IndexTuple pos, size_t length);
@@ -67,7 +61,7 @@ public:
     void pasteText(IndexTuple pos) const;
 
     void deleteLine(size_t lineIdx);
-    void loadLine(string &text);
+    void loadLine(std::string &text);
     void free();
 
     TextEditor(const TextEditor&) = delete;

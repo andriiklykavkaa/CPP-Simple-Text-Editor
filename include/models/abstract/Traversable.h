@@ -23,6 +23,7 @@ public:
 
     [[nodiscard]] virtual size_t get_length() const = 0;
     [[nodiscard]] virtual bool is_index_in_range(size_t pos) const = 0;
+
     virtual void free() = 0;
 };
 

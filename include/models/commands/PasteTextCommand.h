@@ -15,7 +15,7 @@ private:
     string text;
 
 public:
-    PasteTextCommand(TextEditor &editor, IndexTuple pos, string &text);
+    PasteTextCommand(TextEditor &editor, IndexTuple pos, const string &text);
     void execute() override;
     void undo() override;
 };

@@ -37,8 +37,8 @@ void TextLine::delete_text(size_t pos, size_t length) {
 }
 
 void TextLine::cut_text(size_t pos, size_t length, std::string &buffer) {
-    this->text.erase(pos, length);
     buffer = this->text.substr(pos, length);
+    this->text.erase(pos, length);
 }
 
 void TextLine::copy_text(size_t pos, size_t length, std::string &buffer) const {

@@ -6,8 +6,10 @@
 #include "../../../include/models/TextEditor.h"
 
 
-PasteTextCommand::PasteTextCommand(TextEditor &editor, const IndexTuple pos, std::string &text) :
-editor(editor), pos(pos), text(std::move(text)) {}
+PasteTextCommand::PasteTextCommand(TextEditor &editor, const IndexTuple pos, const std::string &text) :
+editor(editor), pos(pos) {
+    this->text = text;
+}
 
 void PasteTextCommand::execute() {
     editor.insertText(pos, text);

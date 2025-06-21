@@ -78,6 +78,8 @@ void handleCommand(AppContext &context, CommandType command) {
         case finish:
             exitProgram();
             break;
+        case COUNT:
+            break;
     }
 }
 
@@ -88,7 +90,7 @@ bool isDigit(const string &s) {
 }
 
 [[noreturn]] int main() {
-    TextEditor editor(16);
+    TextEditor editor;
     CommandManager manager(5);
 
     AppContext context(editor, manager);

@@ -13,6 +13,7 @@ private:
 public:
     explicit TextLine(std::string text) : text(std::move(text)) {};
     explicit TextLine() = default;
+    ~TextLine() override = default;
 
     [[nodiscard]] std::string display() const override;
     void load_data(std::string &text) override;

@@ -137,7 +137,7 @@ void cutText(const AppContext &context) {
     std::string text = context.editor.getText(pos, length);
 
     context.editor.setBufferText(text);
-    context.manager.executeCommand(new CutTextCommand(context.editor, pos, text));
+    context.manager.executeCommand(new CutTextCommand(context.editor, pos, length));
 }
 
 void pasteText(const AppContext &context) {

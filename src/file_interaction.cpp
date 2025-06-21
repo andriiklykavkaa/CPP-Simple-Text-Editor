@@ -10,37 +10,35 @@
 #include "../include/models/lines/TextLine.h"
 
 
-using namespace std;
-
-void writeBufferToFile(const TextEditor &editor, const string &path) {
-    ofstream file(path);
+void writeBufferToFile(const TextEditor &editor, const std::string &path) {
+    std::ofstream file(path);
     if (!file.is_open()) {
-        cerr << "Could not write to file at path: " << path << endl;
+        std::cerr << "Could not write to file at path: " << path << std::endl;
         return;
     }
 
     const size_t bufHeight = editor.getHeight();
-    const TextLine *lines = editor.getLines();
+    const std::vector<TextLine*> lines = editor.getLines();
     for (int i = 0; i < bufHeight; ++i) {
-        file << lines[i].display() << "\n";
+        file << lines.at(i)->display() << "\n";
     }
     file.close();
-    cout << "File is successfully written." << endl;
+    std::cout << "File is successfully written." << std::endl;
 }
 
-void readFileToBuffer(TextEditor &buffer, const string &path) {
+void readFileToBuffer(TextEditor &buffer, const std::string &path) {
     buffer.free();
-    ifstream file(path);
+    std::ifstream file(path);
     if (!file.is_open()) {
-        cerr << "Could not read file at path: " << path << endl;
+        std::cerr << "Could not read file at path: " << path << std::endl;
         return;
     }
 
-    string line;
+    std::string line;
     while(getline(file, line)) {
         if (line.back() == '\n') line.pop_back();
         buffer.loadLine(line);
     }
     file.close();
-    cout << "File is successfully read." << endl;
+    std::cout << "File is successfully read." << std::endl;
 }
