@@ -4,10 +4,10 @@
 
 #ifndef TEXTLINE_H
 #define TEXTLINE_H
-#include "../abstract/Readable.h"
+#include "../abstract/BaseLine.h"
 #include "../abstract/Traversable.h"
 
-class TextLine final : public IReadable, public ITraversable {
+class TextLine final : public BaseLine, public ITraversable {
 private:
     std::string text;
 public:
@@ -17,6 +17,8 @@ public:
 
     [[nodiscard]] std::string display() const override;
     void load_data(std::string &text) override;
+
+    char *get_data() override;
 
     void append_text(const std::string &text) override;
     void insert_text(size_t pos, const std::string &text) override;

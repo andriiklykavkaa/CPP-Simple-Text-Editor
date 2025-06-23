@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 #include <format>
+#include <dlfcn.h>
 
 std::string TextLine::display() const {
     return std::format("(T) {}", text);
@@ -14,6 +15,10 @@ std::string TextLine::display() const {
 
 void TextLine::load_data(std::string &text) {
     this->text = text;
+}
+
+char *TextLine::get_data() {
+    return text.data();
 }
 
 void TextLine::append_text(const std::string& text) {

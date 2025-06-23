@@ -27,7 +27,7 @@ void showInstructions() {
     cout << "3 - save to file." << endl;
     cout << "4 - load from file." << endl;
     cout << "5 - print text." << endl;
-    cout << "6 - insert in text by line and index." << endl;
+    cout << "6 - insert in text." << endl;
     cout << "7 - search in text." << endl;
     cout << "8 - delete in text." << endl;
     cout << "9 - undo." << endl;
@@ -37,7 +37,9 @@ void showInstructions() {
     cout << "13 - copy text." << endl;
     cout << "14 - replace." << endl;
     cout << "15 - set cursor position." << endl;
-    cout << "16 - exit program." << endl;
+    cout << "16 - encrypt text" << endl;
+    cout << "17 - decrept text" << endl;
+    cout << "18 - exit program." << endl;
 }
 
 void appendText(const AppContext &context) {
@@ -232,6 +234,16 @@ void setCursorPos(const AppContext &context) {
 
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     context.editor.setCursorPos(pos);
+}
+
+// Encryption & Decryption with DLL
+
+void encryptText(const AppContext &context) {
+    context.editor.encryptText();
+}
+
+void decryptText(const AppContext &context) {
+    context.editor.decryptText();
 }
 
 void exitProgram() {

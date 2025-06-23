@@ -4,6 +4,7 @@
 
 #include "../../../include/models/lines/CheckboxLine.h"
 
+#include <dlfcn.h>
 #include <format>
 
 std::string CheckboxLine::display() const {
@@ -12,4 +13,8 @@ std::string CheckboxLine::display() const {
 
 void CheckboxLine::load_data(std::string &text) {
     this->text = text;
+}
+
+char *CheckboxLine::get_data() {
+    return text.data();
 }

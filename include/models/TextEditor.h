@@ -15,7 +15,7 @@
 class TextEditor {
 private:
 
-    std::vector<IReadable*> lines;
+    std::vector<BaseLine*> lines;
     std::string bufferText;
 
     struct Cursor {
@@ -40,7 +40,7 @@ public:
     explicit TextEditor();
     ~TextEditor();
 
-    [[nodiscard]] std::vector<IReadable*> getLines() const;
+    [[nodiscard]] std::vector<BaseLine*> getLines() const;
     [[nodiscard]] size_t getHeight() const;
     [[nodiscard]] std::string &getBufferText();
     void setBufferText(std::string &text);
@@ -59,6 +59,8 @@ public:
     void deleteText(IndexTuple pos, size_t length) const;
     [[nodiscard]] std::string getText(IndexTuple pos, size_t length) const;
     void copyText(IndexTuple pos, size_t length);
+    void encryptText();
+    void decryptText();
 
     void loadLine(std::string &text);
     void free();

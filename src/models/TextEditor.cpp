@@ -5,24 +5,28 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "../../include/models/TextEditor.h"
 
+#include <dlfcn.h>
+#include <libgen.h>
+#include <mach-o/dyld.h>
+
+#include "../../include/models/TextEditor.h"
 #include "../../include/command_execution.h"
 #include "../../include/models//utility/IndexTuple.h"
 #include "../../include/models/lines/CheckboxLine.h"
 #include "../../include/models/lines/ContactLine.h"
 
 TextEditor::TextEditor() {
-    IReadable* l = new TextLine();
+    BaseLine* l = new TextLine();
     lines.push_back(l);
 }
 
 TextEditor::~TextEditor() {
-    for(IReadable* l : lines)
+    for(BaseLine* l : lines)
         delete l;
 }
 
-std::vector<IReadable*> TextEditor::getLines() const {
+std::vector<BaseLine*> TextEditor::getLines() const {
     return lines;
 }
 
@@ -40,7 +44,7 @@ void TextEditor::setBufferText(std::string &text) {
 }
 
 void TextEditor::printLines() const {
-    for(IReadable* l : lines)
+    for(BaseLine* l : lines)
         std::cout << l->display() << std::endl;
 }
 
@@ -115,7 +119,7 @@ void TextEditor::copyText(const IndexTuple pos, const size_t length) {
 
 
 void TextEditor::free() {
-    for(IReadable *l : lines)
+    for(BaseLine *l : lines)
         delete l;
     lines.clear();
 }
@@ -143,7 +147,7 @@ void TextEditor::printCursorPos() const {
 }
 
 void TextEditor::loadLine(std::string &text) {
-    IReadable *l;
+    BaseLine *l;
     std::string input;
     if (text.length() < 3)
         return;
@@ -169,3 +173,62 @@ void TextEditor::loadLine(std::string &text) {
     l->load_data(input);
     lines.push_back(l);
 }
+
+void TextEditor::encryptText() {
+
+    char exePath[1024];
+    uint32_t size = sizeof(exePath);
+    if (_NSGetExecutablePath(exePath, &size) != 0) {
+        fprintf(stderr, "Cannot get executable path\n");
+        return;
+    }
+
+    std::string dir = dirname(exePath);
+    std::string libPath = dir + "/../dlls/libcryption.so";
+
+
+    void* handle = dlopen("../dlls/libcryption.so", RTLD_LAZY);
+    if (!handle) {
+        fprintf(stderr, "Error: %s\n", dlerror());
+        return;
+    }
+
+    typedef void (*EncryptFunc)(char*);
+    EncryptFunc encrypt = (EncryptFunc)dlsym(handle, "encrypt");
+
+    if (!encrypt) {
+        fprintf(stderr, "Error: %s\n", dlerror());
+        dlclose(handle);
+        return;
+    }
+
+    for(BaseLine *l : lines) {
+        encrypt(l->get_data());
+    }
+
+    dlclose(handle);
+}
+
+void TextEditor::decryptText() {
+    void* handle = dlopen("../dlls/libcryption.so", RTLD_LAZY);
+    if (!handle) {
+        fprintf(stderr, "Error: %s\n", dlerror());
+        return;
+    }
+
+    typedef void (*DecryptFunc)(char*);
+    DecryptFunc decrypt = (DecryptFunc)dlsym(handle, "decrypt");
+
+    if (!decrypt) {
+        fprintf(stderr, "Error: %s\n", dlerror());
+        dlclose(handle);
+        return;
+    }
+
+    for(BaseLine *l : lines) {
+        decrypt(l->get_data());
+    }
+
+    dlclose(handle);
+}
+

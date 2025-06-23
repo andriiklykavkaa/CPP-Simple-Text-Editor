@@ -7,13 +7,14 @@
 
 #include <string>
 
-class IReadable {
+class BaseLine {
 
 public:
-    virtual ~IReadable() = default;
+    virtual ~BaseLine() = default;
 
     [[nodiscard]] virtual std::string display() const = 0;
     virtual void load_data(std::string &text) = 0;
+    virtual char *get_data() = 0;
 };
 
 #endif //LINE_H

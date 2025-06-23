@@ -4,6 +4,7 @@
 
 #include "../../../include/models/lines/ContactLine.h"
 
+#include <dlfcn.h>
 #include <format>
 
 std::string ContactLine::display() const {
@@ -12,4 +13,8 @@ std::string ContactLine::display() const {
 
 void ContactLine::load_data(std::string &text) {
     this->text = std::move(text);
+}
+
+char *ContactLine::get_data() {
+    return text.data();
 }

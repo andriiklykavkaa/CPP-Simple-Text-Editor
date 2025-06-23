@@ -5,9 +5,9 @@
 #ifndef CONTACTLINE_H
 #define CONTACTLINE_H
 
-#include "../abstract/Readable.h"
+#include "../abstract/BaseLine.h"
 
-class ContactLine : public IReadable {
+class ContactLine : public BaseLine {
 private:
     std::string text;
 public:
@@ -15,7 +15,8 @@ public:
     explicit ContactLine(std::string text) : text{std::move(text)} {};
     [[nodiscard]] std::string display() const override;
     void load_data(std::string &text) override;
-    void set_data(std::string &name, std::string &email);
+
+    char *get_data() override;
 };
 
 

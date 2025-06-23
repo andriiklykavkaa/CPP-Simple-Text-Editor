@@ -18,7 +18,7 @@ void writeBufferToFile(const TextEditor &editor, const std::string &path) {
     }
 
     const size_t bufHeight = editor.getHeight();
-    const std::vector<IReadable*> lines = editor.getLines();
+    const std::vector<BaseLine*> lines = editor.getLines();
     for (int i = 0; i < bufHeight; ++i) {
         file << lines.at(i)->display() << "\n";
     }

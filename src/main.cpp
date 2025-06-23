@@ -22,8 +22,10 @@ enum CommandType {
     duplicate = 13,
     interchange = 14,
     cursor = 15,
-    finish = 16,
-    COUNT = 17
+    encrypt = 16,
+    decrypt = 17,
+    finish = 18,
+    COUNT = 19
 };
 
 void handleCommand(AppContext &context, CommandType command) {
@@ -76,9 +78,15 @@ void handleCommand(AppContext &context, CommandType command) {
         case cursor:
             setCursorPos(context);
             break;
+        case encrypt:
+            encryptText(context);
+            break;
+        case decrypt:
+            decryptText(context);
+            break;
         case finish:
             exitProgram();
-            break;
+        break;
         case COUNT:
             break;
     }
