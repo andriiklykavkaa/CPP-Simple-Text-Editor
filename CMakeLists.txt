@@ -41,6 +41,8 @@ add_executable(TextEditorCPP src/main.cpp
         src/models/lines/CheckboxLine.cpp
         include/models/utility/IndexTuple.h
         include/models/abstract/Traversable.h
+        include/models/EditorManager.h
+        include/models/utility/LineType.h
 )
 
 add_custom_command(TARGET TextEditorCPP POST_BUILD

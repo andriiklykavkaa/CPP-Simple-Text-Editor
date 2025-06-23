@@ -4,6 +4,7 @@
 
 #ifndef FILE_INTERACTION_H
 #define FILE_INTERACTION_H
+
 #include "models/TextEditor.h"
 
 void writeBufferToFile(const TextEditor &editor, const std::string &path);

@@ -6,12 +6,6 @@
 #define COMMANDS_H
 #include "models/AppContext.h"
 
-enum LineType {
-    text = 't',
-    contact = 'c',
-    checkbox = 'x'
-};
-
 void showInstructions();
 void appendText(const AppContext &context);
 void addNewLine(const AppContext &context);
@@ -30,6 +24,8 @@ void replaceText(const AppContext &context);
 void setCursorPos(const AppContext &context);
 void encryptText(const AppContext &context);
 void decryptText(const AppContext &context);
+void switchTabs(const AppContext &context);
+void getTab(const AppContext &context);
 void exitProgram();
 
 #endif //COMMANDS_H

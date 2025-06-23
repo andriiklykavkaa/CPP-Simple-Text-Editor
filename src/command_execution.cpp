@@ -6,8 +6,6 @@
 
 #include "../include/command_execution.h"
 #include "../include/file_interaction.h"
-#include "../include/models/TextEditor.h"
-#include "../include/models/CommandManager.h"
 #include "../include/models/AppContext.h"
 #include "../include/models/commands/AddLineCommand.h"
 #include "../include/models/commands/AppendTextCommand.h"
@@ -22,6 +20,7 @@ using namespace std;
 void showInstructions() {
     cout << "The list of instructions." << endl;
     cout << "0 - show the list of commands." << endl;
+    cout << "=====================" << endl;
     cout << "1 - append text." << endl;
     cout << "2 - add new line." << endl;
     cout << "3 - save to file." << endl;
@@ -30,16 +29,24 @@ void showInstructions() {
     cout << "6 - insert in text." << endl;
     cout << "7 - search in text." << endl;
     cout << "8 - delete in text." << endl;
+    cout << "=====================" << endl;
     cout << "9 - undo." << endl;
     cout << "10 - redo." << endl;
+    cout << "=====================" << endl;
     cout << "11 - cut text." << endl;
     cout << "12 - paste text." << endl;
     cout << "13 - copy text." << endl;
+    cout << "=====================" << endl;
     cout << "14 - replace." << endl;
     cout << "15 - set cursor position." << endl;
+    cout << "=====================" << endl;
     cout << "16 - encrypt text" << endl;
     cout << "17 - decrept text" << endl;
-    cout << "18 - exit program." << endl;
+    cout << "=====================" << endl;
+    cout << "18 - switch tabs" << endl;
+    cout << "19 - see current tab." << endl;
+    cout << "=====================" << endl;
+    cout << "20 - exit program." << endl;
 }
 
 void appendText(const AppContext &context) {
@@ -47,7 +54,7 @@ void appendText(const AppContext &context) {
     cout << "Enter text to append: ";
     getline(cin, text);
 
-    context.manager.executeCommand(new AppendTextCommand(context.editor, text));
+    context.c_manager.executeCommand(new AppendTextCommand(*context.e_manager.tabs[context.e_manager.curr], text));
 }
 
 void addNewLine(const AppContext &context) {
@@ -59,7 +66,7 @@ void addNewLine(const AppContext &context) {
 
     switch (ch) {
         case 't': {
-            context.manager.executeCommand(new AddLineCommand(context.editor, text));
+            context.c_manager.executeCommand(new AddLineCommand(*context.e_manager.tabs[context.e_manager.curr], text));
             break;
         }
         case 'c': {
@@ -70,8 +77,8 @@ void addNewLine(const AppContext &context) {
             getline(cin, email);
             string input = std::format("Name: {}, Email: {}", name, email);
 
-            context.manager.executeCommand(new AddLineCommand(context.editor, contact));
-            context.editor.getLines().back()->load_data(input);
+            context.c_manager.executeCommand(new AddLineCommand(*context.e_manager.tabs[context.e_manager.curr], contact));
+            context.e_manager.tabs[context.e_manager.curr]->getLines().back()->load_data(input);
             break;
         }
 
@@ -85,8 +92,8 @@ void addNewLine(const AppContext &context) {
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::string input = std::format("[{}] {}", (status == 'y' ? "X" : " "), text);
 
-            context.manager.executeCommand(new AddLineCommand(context.editor, checkbox));
-            context.editor.getLines().back()->load_data(input);
+            context.c_manager.executeCommand(new AddLineCommand(*context.e_manager.tabs[context.e_manager.curr], checkbox));
+            context.e_manager.tabs[context.e_manager.curr]->getLines().back()->load_data(input);
             break;
         }
         default:
@@ -99,19 +106,19 @@ void saveFile(const AppContext &context) {
     string path;
     cout << "Enter file path for saving: ";
     cin >> path;
-    writeBufferToFile(context.editor, path);
+    writeBufferToFile(*context.e_manager.tabs[context.e_manager.curr], path);
 }
 
 void loadFile(const AppContext &context) {
     string path;
     cout << "Enter file path for loading: ";
     cin >> path;
-    readFileToBuffer(context.editor, path);
+    readFileToBuffer(*context.e_manager.tabs[context.e_manager.curr], path);
 }
 
 void printText(const AppContext &context) {
-    context.editor.printCursorPos();
-    context.editor.printLines();
+    context.e_manager.tabs[context.e_manager.curr]->printCursorPos();
+    context.e_manager.tabs[context.e_manager.curr]->printLines();
 }
 
 void insertByLineAndIndex(const AppContext &context) {
@@ -119,9 +126,9 @@ void insertByLineAndIndex(const AppContext &context) {
     cout << "Enter text to insert: ";
     getline(cin, text);
 
-    context.manager.executeCommand(new InsertTextCommand(
-        context.editor,
-        context.editor.getCursorPos(),
+    context.c_manager.executeCommand(new InsertTextCommand(
+        *context.e_manager.tabs[context.e_manager.curr],
+        context.e_manager.tabs[context.e_manager.curr]->getCursorPos(),
         text)
         );
 }
@@ -130,7 +137,7 @@ void searchText(const AppContext &context) {
     string text;
     cout << "Enter text to search: ";
     getline(cin, text);
-    context.editor.search(text);
+    context.e_manager.tabs[context.e_manager.curr]->search(text);
 }
 
 void deleteText(const AppContext &context) {
@@ -148,18 +155,18 @@ void deleteText(const AppContext &context) {
     }
 
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    context.manager.executeCommand(new DeleteTextCommand(
-        context.editor,
-        context.editor.getCursorPos(),
+    context.c_manager.executeCommand(new DeleteTextCommand(
+        *context.e_manager.tabs[context.e_manager.curr],
+        context.e_manager.tabs[context.e_manager.curr]->getCursorPos(),
         length));
 }
 
 void undoCommand(const AppContext &context) {
-    context.manager.undo();
+    context.c_manager.undo();
 }
 
 void redoCommand(const AppContext &context) {
-    context.manager.redo();
+    context.c_manager.redo();
 }
 
 void cutText(const AppContext &context) {
@@ -177,16 +184,16 @@ void cutText(const AppContext &context) {
 
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-    const IndexTuple pos = context.editor.getCursorPos();
-    std::string text = context.editor.getText(pos, length);
+    const IndexTuple pos = context.e_manager.tabs[context.e_manager.curr]->getCursorPos();
+    std::string text = context.e_manager.tabs[context.e_manager.curr]->getText(pos, length);
 
-    context.editor.setBufferText(text);
-    context.manager.executeCommand(new CutTextCommand(context.editor, pos, length));
+    context.e_manager.tabs[context.e_manager.curr]->setBufferText(text);
+    context.c_manager.executeCommand(new CutTextCommand(*context.e_manager.tabs[context.e_manager.curr], pos, length));
 }
 
 void pasteText(const AppContext &context) {
-    const IndexTuple pos = context.editor.getCursorPos();
-    context.manager.executeCommand(new PasteTextCommand(context.editor, pos, context.editor.getBufferText()));
+    const IndexTuple pos = context.e_manager.tabs[context.e_manager.curr]->getCursorPos();
+    context.c_manager.executeCommand(new PasteTextCommand(*context.e_manager.tabs[context.e_manager.curr], pos, context.e_manager.tabs[context.e_manager.curr]->getBufferText()));
 }
 
 void copyText(const AppContext &context) {
@@ -204,8 +211,8 @@ void copyText(const AppContext &context) {
 
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-    const IndexTuple pos = context.editor.getCursorPos();
-    context.editor.copyText(pos, length);
+    const IndexTuple pos = context.e_manager.tabs[context.e_manager.curr]->getCursorPos();
+    context.e_manager.tabs[context.e_manager.curr]->copyText(pos, length);
 }
 
 void replaceText(const AppContext &context) {
@@ -214,9 +221,9 @@ void replaceText(const AppContext &context) {
     cout << "Enter text to replace to: ";
     getline(cin, text);
 
-    const IndexTuple pos = context.editor.getCursorPos();
+    const IndexTuple pos = context.e_manager.tabs[context.e_manager.curr]->getCursorPos();
 
-    context.manager.executeCommand(new ReplaceTextCommand(context.editor, pos, text));
+    context.c_manager.executeCommand(new ReplaceTextCommand(*context.e_manager.tabs[context.e_manager.curr], pos, text));
 }
 
 void setCursorPos(const AppContext &context) {
@@ -233,17 +240,47 @@ void setCursorPos(const AppContext &context) {
     }
 
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    context.editor.setCursorPos(pos);
+    context.e_manager.tabs[context.e_manager.curr]->setCursorPos(pos);
 }
 
 // Encryption & Decryption with DLL
 
 void encryptText(const AppContext &context) {
-    context.editor.encryptText();
+    context.e_manager.tabs[context.e_manager.curr]->encryptText();
 }
 
 void decryptText(const AppContext &context) {
-    context.editor.decryptText();
+    context.e_manager.tabs[context.e_manager.curr]->decryptText();
+}
+
+// Tabs logic
+void switchTabs(const AppContext &context) {
+    size_t idx;
+
+    cout << "Enter tab index: ";
+    cin >> idx;
+
+    if (cin.fail()) {
+        cerr << "Invalid input. Try again." << endl;
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        return;
+    }
+
+    if (idx >= context.e_manager.tabs.size()) {
+        TextEditor *e = new TextEditor();
+        context.e_manager.tabs.push_back(e);
+        size_t new_curr = context.e_manager.tabs.size() - 1;
+        context.e_manager.curr = new_curr;
+        cout << "New Tab: " << new_curr << endl;
+    } else {
+        context.e_manager.curr = idx;
+        cout << "Switched to tab: " << idx << endl;
+    }
+}
+
+void getTab(const AppContext &context) {
+    cout << "You are in Tab: " << context.e_manager.curr << endl;
 }
 
 void exitProgram() {

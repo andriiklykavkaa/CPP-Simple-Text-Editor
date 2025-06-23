@@ -7,9 +7,9 @@
 #include <string>
 #include <vector>
 
-#include "../command_execution.h"
 #include "lines/TextLine.h"
 #include "utility/IndexTuple.h"
+#include "utility/LineType.h"
 
 
 class TextEditor {

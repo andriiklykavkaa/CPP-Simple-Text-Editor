@@ -4,6 +4,7 @@
 #include "../include/command_execution.h"
 #include "../include/models/TextEditor.h"
 #include "../include/models/CommandManager.h"
+#include "models/EditorManager.h"
 
 enum CommandType {
     help = 0,
@@ -24,8 +25,10 @@ enum CommandType {
     cursor = 15,
     encrypt = 16,
     decrypt = 17,
-    finish = 18,
-    COUNT = 19
+    tabs = 18,
+    curr_tab = 19,
+    finish = 20,
+    COUNT = 21
 };
 
 void handleCommand(AppContext &context, CommandType command) {
@@ -84,9 +87,15 @@ void handleCommand(AppContext &context, CommandType command) {
         case decrypt:
             decryptText(context);
             break;
+        case tabs:
+            switchTabs(context);
+            break;
+        case curr_tab:
+            getTab(context);
+        break;
         case finish:
             exitProgram();
-        break;
+            break;
         case COUNT:
             break;
     }
@@ -100,9 +109,11 @@ bool isDigit(const std::string &s) {
 
 [[noreturn]] int main() {
     TextEditor editor;
-    CommandManager manager(5);
+    CommandManager c_manager(5);
 
-    AppContext context(editor, manager);
+    EditorManager e_manager;
+    e_manager.tabs.push_back(new TextEditor());
+    AppContext context(e_manager, c_manager);
 
     std::cout << "Welcome to text editor!" << std::endl;
 
