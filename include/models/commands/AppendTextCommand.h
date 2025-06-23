@@ -12,6 +12,7 @@ class AppendTextCommand: public ICommand {
 private:
     TextEditor &editor;
     string text;
+    IndexTuple pos;
 
 public:
     AppendTextCommand(TextEditor &editor, string text);

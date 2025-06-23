@@ -11,12 +11,12 @@
 class CutTextCommand: public ICommand {
 private:
     TextEditor &editor;
-    string text;
-    size_t lineIdx;
-    size_t charIdx;
+    string cutted_text;
+    IndexTuple pos;
+    size_t length;
 
 public:
-    CutTextCommand(TextEditor &editor, size_t lineIdx, size_t charIdx, string text);
+    CutTextCommand(TextEditor &editor, IndexTuple pos, size_t length);
     void execute() override;
     void undo() override;
 };

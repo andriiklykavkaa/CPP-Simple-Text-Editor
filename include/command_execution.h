@@ -22,6 +22,10 @@ void pasteText(const AppContext &context);
 void copyText(const AppContext &context);
 void replaceText(const AppContext &context);
 void setCursorPos(const AppContext &context);
+void encryptText(const AppContext &context);
+void decryptText(const AppContext &context);
+void switchTabs(const AppContext &context);
+void getTab(const AppContext &context);
 void exitProgram();
 
 #endif //COMMANDS_H

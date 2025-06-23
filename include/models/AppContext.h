@@ -5,12 +5,12 @@
 #ifndef APPCONTEXT_H
 #define APPCONTEXT_H
 
-#include "TextEditor.h"
-#include "CommandManager.h"
+#include "models/EditorManager.h"
+#include "models/CommandManager.h"
 
 struct AppContext {
-    TextEditor &editor;
-    CommandManager &manager;
+    EditorManager &e_manager;
+    CommandManager &c_manager;
 };
 
 

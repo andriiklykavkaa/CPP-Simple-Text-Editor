@@ -3,6 +3,10 @@ project(TextEditorCPP)
 
 set(CMAKE_CXX_STANDARD 20)
 
+include_directories(${PROJECT_SOURCE_DIR}/include)
+
+file(GLOB_RECURSE SOURCES src/*.cpp)
+
 add_executable(TextEditorCPP src/main.cpp
         src/models/TextEditor.cpp
         include/models/TextEditor.h
@@ -28,4 +32,20 @@ add_executable(TextEditorCPP src/main.cpp
         src/models/commands/PasteTextCommand.cpp
         include/models/commands/ReplaceTextCommand.h
         src/models/commands/ReplaceTextCommand.cpp
+        include/models/abstract/BaseLine.h
+        src/models/lines/TextLine.cpp
+        include/models/lines/TextLine.h
+        src/models/lines/ContactLine.cpp
+        include/models/lines/ContactLine.h
+        include/models/lines/CheckboxLine.h
+        src/models/lines/CheckboxLine.cpp
+        include/models/utility/IndexTuple.h
+        include/models/abstract/Traversable.h
+        include/models/EditorManager.h
+        include/models/utility/LineType.h
 )
+
+add_custom_command(TARGET TextEditorCPP POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_SOURCE_DIR}/dlls/libcryption.so
+        $<TARGET_FILE_DIR:TextEditorCPP>)

@@ -6,15 +6,17 @@
 #include "../../../include/models/TextEditor.h"
 
 
-PasteTextCommand::PasteTextCommand(TextEditor &editor, size_t lineIdx, size_t charIdx, string text) :
-editor(editor), lineIdx(lineIdx), charIdx(charIdx), text(move(text)) {}
+PasteTextCommand::PasteTextCommand(TextEditor &editor, const IndexTuple pos, const std::string &text) :
+editor(editor), pos(pos) {
+    this->text = text;
+}
 
 void PasteTextCommand::execute() {
-    editor.insertText(lineIdx, charIdx, text);
+    editor.insertText(pos, text);
     editor.moveCursorCharIdx(text.length(), true);
 }
 
 void PasteTextCommand::undo() {
-    editor.deleteText(lineIdx, charIdx, text.length());
+    editor.deleteText(pos, text.length());
     editor.moveCursorCharIdx(text.length(), false);
 }

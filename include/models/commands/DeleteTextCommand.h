@@ -11,13 +11,12 @@
 class DeleteTextCommand: public ICommand {
 private:
     TextEditor &editor;
-    size_t lineIdx;
-    size_t charIdx;
+    IndexTuple pos;
     size_t length;
     string deletedText;
 
 public:
-    explicit DeleteTextCommand(TextEditor &editor, size_t lineIdx, size_t charIdx, size_t length);
+    explicit DeleteTextCommand(TextEditor &editor, IndexTuple pos, size_t length);
     void execute() override;
     void undo() override;
 };

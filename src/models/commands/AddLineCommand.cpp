@@ -5,11 +5,11 @@
 #include "../../../include/models/commands/AddLineCommand.h"
 #include "../../../include/models/TextEditor.h"
 
-AddLineCommand::AddLineCommand(TextEditor &editor) :
-editor(editor) {}
+AddLineCommand::AddLineCommand(TextEditor &editor, LineType type) :
+editor(editor), type(type) {}
 
 void AddLineCommand::execute() {
-    editor.addLine();
+    editor.addLine(type);
 }
 
 void AddLineCommand::undo() {

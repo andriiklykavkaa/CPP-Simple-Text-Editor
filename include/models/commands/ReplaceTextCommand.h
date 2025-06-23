@@ -12,13 +12,12 @@
 class ReplaceTextCommand: public ICommand {
 private:
     TextEditor &editor;
+    IndexTuple pos;
     string insertedText;
     string deletedText;
-    size_t lineIdx;
-    size_t charIdx;
 
 public:
-    ReplaceTextCommand(TextEditor &editor, size_t lineIdx, size_t charIdx, string text);
+    ReplaceTextCommand(TextEditor &editor, IndexTuple pos, string text);
     void execute() override;
     void undo() override;
 };

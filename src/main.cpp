@@ -2,7 +2,9 @@
 #include <sstream>
 
 #include "../include/command_execution.h"
-#include "../include/models/AppContext.h"
+#include "../include/models/TextEditor.h"
+#include "../include/models/CommandManager.h"
+#include "models/EditorManager.h"
 
 enum CommandType {
     help = 0,
@@ -21,8 +23,12 @@ enum CommandType {
     duplicate = 13,
     interchange = 14,
     cursor = 15,
-    finish = 16,
-    COUNT = 17
+    encrypt = 16,
+    decrypt = 17,
+    tabs = 18,
+    curr_tab = 19,
+    finish = 20,
+    COUNT = 21
 };
 
 void handleCommand(AppContext &context, CommandType command) {
@@ -75,23 +81,39 @@ void handleCommand(AppContext &context, CommandType command) {
         case cursor:
             setCursorPos(context);
             break;
+        case encrypt:
+            encryptText(context);
+            break;
+        case decrypt:
+            decryptText(context);
+            break;
+        case tabs:
+            switchTabs(context);
+            break;
+        case curr_tab:
+            getTab(context);
+        break;
         case finish:
             exitProgram();
+            break;
+        case COUNT:
             break;
     }
 }
 
-bool isDigit(const string &s) {
-    istringstream iss(s);
+bool isDigit(const std::string &s) {
+    std::istringstream iss(s);
     double d;
     return iss >> std::noskipws >> d && iss.eof();
 }
 
 [[noreturn]] int main() {
-    TextEditor editor(16);
-    CommandManager manager(5);
+    TextEditor editor;
+    CommandManager c_manager(5);
 
-    AppContext context(editor, manager);
+    EditorManager e_manager;
+    e_manager.tabs.push_back(new TextEditor());
+    AppContext context(e_manager, c_manager);
 
     std::cout << "Welcome to text editor!" << std::endl;
 

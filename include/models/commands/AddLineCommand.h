@@ -6,15 +6,17 @@
 #define ADDLINECOMMAND_H
 
 #include "../TextEditor.h"
+#include "../../command_execution.h"
 #include "../abstract/Command.h"
 
 
 class AddLineCommand: public ICommand {
 private:
     TextEditor &editor;
+    LineType type;
 
 public:
-    explicit AddLineCommand(TextEditor &editor);
+    explicit AddLineCommand(TextEditor &editor, LineType type);
     void execute() override;
     void undo() override;
 };
