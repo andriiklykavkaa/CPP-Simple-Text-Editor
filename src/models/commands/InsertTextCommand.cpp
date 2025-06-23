@@ -6,7 +6,7 @@
 #include "../../../include/models/TextEditor.h"
 
 InsertTextCommand::InsertTextCommand(TextEditor &editor, const IndexTuple pos, string &text) :
-editor(editor), text(move(text)), pos(pos) {}
+editor(editor), text(std::move(text)), pos(pos) {}
 
 void InsertTextCommand::execute() {
     editor.insertText(pos, text);

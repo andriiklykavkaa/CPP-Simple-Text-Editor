@@ -6,6 +6,12 @@
 #define COMMANDS_H
 #include "models/AppContext.h"
 
+enum LineType {
+    text = 't',
+    contact = 'c',
+    checkbox = 'x'
+};
+
 void showInstructions();
 void appendText(const AppContext &context);
 void addNewLine(const AppContext &context);

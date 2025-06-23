@@ -10,7 +10,6 @@
 class IReadable {
 
 public:
-    explicit IReadable() = default;
     virtual ~IReadable() = default;
 
     [[nodiscard]] virtual std::string display() const = 0;

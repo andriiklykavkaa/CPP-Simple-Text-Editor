@@ -6,9 +6,10 @@
 
 #include <format>
 
-// std::string CheckboxLine::display() {
-//     return "CheckboxLine";
-// }
+std::string CheckboxLine::display() const {
+    return std::format("(X) {}", text);
+}
 
-
-
+void CheckboxLine::load_data(std::string &text) {
+    this->text = text;
+}

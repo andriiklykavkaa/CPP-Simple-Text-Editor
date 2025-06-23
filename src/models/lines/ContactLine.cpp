@@ -6,8 +6,10 @@
 
 #include <format>
 
+std::string ContactLine::display() const {
+    return std::format("(C) {}", text);
+}
 
-// std::string ContactLine::display() {
-//     return "CheckboxLine";
-// }
-
+void ContactLine::load_data(std::string &text) {
+    this->text = std::move(text);
+}

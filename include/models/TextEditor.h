@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "../command_execution.h"
 #include "lines/TextLine.h"
 #include "utility/IndexTuple.h"
 
@@ -14,7 +15,7 @@
 class TextEditor {
 private:
 
-    std::vector<TextLine*> lines;
+    std::vector<IReadable*> lines;
     std::string bufferText;
 
     struct Cursor {
@@ -39,7 +40,7 @@ public:
     explicit TextEditor();
     ~TextEditor();
 
-    [[nodiscard]] std::vector<TextLine*> getLines() const;
+    [[nodiscard]] std::vector<IReadable*> getLines() const;
     [[nodiscard]] size_t getHeight() const;
     [[nodiscard]] std::string &getBufferText();
     void setBufferText(std::string &text);
@@ -51,16 +52,14 @@ public:
 
     void printLines() const;
     void appendText(const std::string& text) const;
-    void addLine();
+    void addLine(LineType type);
+    void deleteLine(size_t lineIdx);
     void insertText(IndexTuple pos, const std::string& text) const;
     void search(const std::string &text) const;
     void deleteText(IndexTuple pos, size_t length) const;
     [[nodiscard]] std::string getText(IndexTuple pos, size_t length) const;
-    void cutText(IndexTuple pos, size_t length);
     void copyText(IndexTuple pos, size_t length);
-    void pasteText(IndexTuple pos) const;
 
-    void deleteLine(size_t lineIdx);
     void loadLine(std::string &text);
     void free();
 

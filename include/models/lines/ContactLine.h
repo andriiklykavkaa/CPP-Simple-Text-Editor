@@ -9,11 +9,13 @@
 
 class ContactLine : public IReadable {
 private:
-    std::string name;
-    std::string email;
+    std::string text;
 public:
-    explicit ContactLine(std::string name, std::string email) : name{std::move(name)}, email{std::move(email)} {};
+    explicit ContactLine() = default;
+    explicit ContactLine(std::string text) : text{std::move(text)} {};
     [[nodiscard]] std::string display() const override;
+    void load_data(std::string &text) override;
+    void set_data(std::string &name, std::string &email);
 };
 
 

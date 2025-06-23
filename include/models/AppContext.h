@@ -5,8 +5,8 @@
 #ifndef APPCONTEXT_H
 #define APPCONTEXT_H
 
-#include "TextEditor.h"
-#include "CommandManager.h"
+class TextEditor;
+class CommandManager;
 
 struct AppContext {
     TextEditor &editor;

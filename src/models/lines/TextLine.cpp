@@ -6,9 +6,10 @@
 
 #include <iostream>
 #include <string>
+#include <format>
 
 std::string TextLine::display() const {
-    return text;
+    return std::format("(T) {}", text);
 }
 
 void TextLine::load_data(std::string &text) {

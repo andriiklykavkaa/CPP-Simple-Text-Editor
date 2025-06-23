@@ -7,6 +7,7 @@
 #include "../include/command_execution.h"
 #include "../include/file_interaction.h"
 #include "../include/models/TextEditor.h"
+#include "../include/models/CommandManager.h"
 #include "../include/models/AppContext.h"
 #include "../include/models/commands/AddLineCommand.h"
 #include "../include/models/commands/AppendTextCommand.h"
@@ -48,7 +49,48 @@ void appendText(const AppContext &context) {
 }
 
 void addNewLine(const AppContext &context) {
-    context.manager.executeCommand(new AddLineCommand(context.editor));
+    LineType type;
+    char ch;
+    std::cout << "Enter line type: ('t' - Text, 'c' - contact, 'x' - checkbox) ";
+    cin >> ch;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    switch (ch) {
+        case 't': {
+            context.manager.executeCommand(new AddLineCommand(context.editor, text));
+            break;
+        }
+        case 'c': {
+            string name, email;
+            cout << "Enter name: ";
+            getline(cin, name);
+            cout << "Enter email: ";
+            getline(cin, email);
+            string input = std::format("Name: {}, Email: {}", name, email);
+
+            context.manager.executeCommand(new AddLineCommand(context.editor, contact));
+            context.editor.getLines().back()->load_data(input);
+            break;
+        }
+
+        case 'x': {
+            string text;
+            char status;
+            cout << "Enter text: ";
+            getline(cin, text);
+            cout << "Is checkbox done [y/n]: ";
+            cin >> status;
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::string input = std::format("[{}] {}", (status == 'y' ? "X" : " "), text);
+
+            context.manager.executeCommand(new AddLineCommand(context.editor, checkbox));
+            context.editor.getLines().back()->load_data(input);
+            break;
+        }
+        default:
+            cout << "Unrecognized line type." << endl;
+            break;
+    }
 }
 
 void saveFile(const AppContext &context) {
@@ -181,7 +223,6 @@ void setCursorPos(const AppContext &context) {
     cout << "Enter line index and char index: ";
     cin >> pos.line_idx >> pos.char_idx;
 
-
     if (cin.fail()) {
         cerr << "Invalid input. Try again." << endl;
         cin.clear();
@@ -192,7 +233,6 @@ void setCursorPos(const AppContext &context) {
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     context.editor.setCursorPos(pos);
 }
-
 
 void exitProgram() {
     cout << "Ending program..." << endl;

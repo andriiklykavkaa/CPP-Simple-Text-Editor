@@ -10,10 +10,11 @@
 class CheckboxLine : public IReadable {
 private:
     std::string text;
-    bool isDone;
 public:
-    explicit CheckboxLine(std::string text, bool isDone = false) : text{std::move(text)}, isDone(isDone) {};
+    explicit CheckboxLine() = default;
+    explicit CheckboxLine(std::string text) : text{std::move(text)} {};
     [[nodiscard]] std::string display() const override;
+    void load_data(std::string &text) override;
 };
 
 #endif //CHECKBOXLINE_H

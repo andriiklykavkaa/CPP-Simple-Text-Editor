@@ -6,19 +6,23 @@
 #include <string>
 #include <vector>
 #include "../../include/models/TextEditor.h"
+
+#include "../../include/command_execution.h"
 #include "../../include/models//utility/IndexTuple.h"
+#include "../../include/models/lines/CheckboxLine.h"
+#include "../../include/models/lines/ContactLine.h"
 
 TextEditor::TextEditor() {
-    TextLine* l = new TextLine();
+    IReadable* l = new TextLine();
     lines.push_back(l);
 }
 
 TextEditor::~TextEditor() {
-    for(TextLine* l : lines)
+    for(IReadable* l : lines)
         delete l;
 }
 
-std::vector<TextLine*> TextEditor::getLines() const {
+std::vector<IReadable*> TextEditor::getLines() const {
     return lines;
 }
 
@@ -36,18 +40,28 @@ void TextEditor::setBufferText(std::string &text) {
 }
 
 void TextEditor::printLines() const {
-    size_t height = getHeight();
-    for (size_t i = 0; i < height; i++) {
-        std::cout << lines.at(i)->display() << std::endl;
-    }
+    for(IReadable* l : lines)
+        std::cout << l->display() << std::endl;
 }
 
 void TextEditor::appendText(const std::string &text) const {
-    lines.back()->append_text(text);
+    if(ITraversable* l = dynamic_cast<ITraversable*>(lines.back())) {
+        l->append_text(text);
+    }
+    else std::cout << "Unable to append to immutable line." << std::endl;
 }
 
-void TextEditor::addLine() {
-    lines.push_back(new TextLine());
+void TextEditor::addLine(const LineType type) {
+    switch (type) {
+        case text:
+            lines.push_back(new TextLine());
+            break;
+        case contact:
+            lines.push_back(new ContactLine());
+            break;
+        case checkbox:
+            lines.push_back(new CheckboxLine());
+    }
 }
 
 void TextEditor::deleteLine(const size_t lineIdx) {
@@ -55,41 +69,56 @@ void TextEditor::deleteLine(const size_t lineIdx) {
         delete lines.at(lineIdx);
         lines.erase(lines.begin() + static_cast<unsigned long>(lineIdx));
     }
-
 }
 
 void TextEditor::insertText(const IndexTuple pos, const std::string &text) const {
-    lines.at(pos.line_idx)->insert_text(pos.char_idx, text);
+    if(ITraversable* l = dynamic_cast<ITraversable*>(lines.at(pos.line_idx))) {
+        l->insert_text(pos.char_idx, text);
+    }
+    else std::cout << "Unable to insert in immutable line." << std::endl;
 }
 
 void TextEditor::search(const std::string &text) const {
     size_t height = lines.size();
     std::cout << "Found at positions: ";
     for (size_t i = 0; i < height; i++) {
-        lines.at(i)->search(i, text);
+        if(ITraversable* l = dynamic_cast<ITraversable*>(lines.at(i))) {
+            l->search(i, text);
+        }
     }
     std::cout << std::endl;
 }
 
 std::string TextEditor::getText(const IndexTuple pos, const size_t length) const {
-    return lines.at(pos.line_idx)->get_text(pos.char_idx, length);
+    if(ITraversable* l = dynamic_cast<ITraversable*>(lines.at(pos.line_idx))) {
+        return l->get_text(pos.char_idx, length);
+    }
+    else {
+        std::cout << "Unable to read in immutable line." << std::endl;
+        return NULL;
+    }
 }
 
 void TextEditor::deleteText(const IndexTuple pos, const size_t length) const {
-    lines.at(pos.line_idx)->delete_text(pos.char_idx, length);
+    if(ITraversable* l = dynamic_cast<ITraversable*>(lines.at(pos.line_idx))) {
+        l->delete_text(pos.char_idx, length);
+    }
+    else std::cout << "Unable to delete in immutable line." << std::endl;
 }
-
-// void TextEditor::cutText(const IndexTuple pos, const size_t length) {
-//     lines.at(pos.line_idx)->cut_text(pos.line_idx, length, bufferText);
-// }
 
 void TextEditor::copyText(const IndexTuple pos, const size_t length) {
-    lines.at(pos.line_idx)->copy_text(pos.char_idx, length, bufferText);
+    if(ITraversable* l = dynamic_cast<ITraversable*>(lines.at(pos.line_idx))) {
+        l->copy_text(pos.char_idx, length, bufferText);
+    }
+    else std::cout << "Unable to copy in immutable line." << std::endl;
 }
 
-// void TextEditor::pasteText(const IndexTuple pos) const {
-//     lines.at(pos.line_idx)->paste_text(pos.char_idx, bufferText);
-// }
+
+void TextEditor::free() {
+    for(IReadable *l : lines)
+        delete l;
+    lines.clear();
+}
 
 // ==== CURSOR ======
 
@@ -102,11 +131,11 @@ void TextEditor::moveCursorCharIdx(const size_t length, const bool toRight) {
 }
 
 void TextEditor::setCursorPos(const IndexTuple pos) {
-    size_t height = lines.size();;
-    if (!(pos.line_idx < height && pos.char_idx < lines.at(pos.line_idx)->get_length()))
-        return;
-    cursor.pos.line_idx = pos.line_idx;
-    cursor.pos.char_idx = pos.char_idx;
+    if (ITraversable* l = dynamic_cast<ITraversable*>(lines.at(pos.line_idx))) {
+        size_t height = lines.size();
+        cursor.pos.line_idx = pos.line_idx < height ? pos.line_idx : height - 1;
+        cursor.pos.char_idx = pos.char_idx < l->get_length() ? pos.char_idx : l->get_length();
+    }
 }
 
 void TextEditor::printCursorPos() const {
@@ -114,13 +143,29 @@ void TextEditor::printCursorPos() const {
 }
 
 void TextEditor::loadLine(std::string &text) {
-    TextLine* l = static_cast<TextLine *>(malloc(sizeof(TextLine)));
-    l->load_data(text);
-    lines.push_back(l);
-}
+    IReadable *l;
+    std::string input;
+    if (text.length() < 3)
+        return;
 
-void TextEditor::free() {
-    for(TextLine *l : lines)
-        delete l;
-    lines.clear();
+    std::string pref = text.substr(0, 3);
+    if (pref == "(T)") {
+        l = new TextLine();
+        input = text.substr(4);
+    }
+    else if (pref == "(C)") {
+        l = new ContactLine();
+        input = text.substr(4);
+    }
+    else if (pref == "(X)") {
+        l = new CheckboxLine();
+        input = text.substr(4);
+    }
+    else {
+        l = new TextLine();
+        input = text;
+    }
+
+    l->load_data(input);
+    lines.push_back(l);
 }

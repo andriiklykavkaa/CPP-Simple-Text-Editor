@@ -2,7 +2,8 @@
 #include <sstream>
 
 #include "../include/command_execution.h"
-#include "../include/models/AppContext.h"
+#include "../include/models/TextEditor.h"
+#include "../include/models/CommandManager.h"
 
 enum CommandType {
     help = 0,
@@ -83,8 +84,8 @@ void handleCommand(AppContext &context, CommandType command) {
     }
 }
 
-bool isDigit(const string &s) {
-    istringstream iss(s);
+bool isDigit(const std::string &s) {
+    std::istringstream iss(s);
     double d;
     return iss >> std::noskipws >> d && iss.eof();
 }

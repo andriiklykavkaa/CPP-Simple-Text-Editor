@@ -7,14 +7,18 @@
 
 AppendTextCommand::AppendTextCommand(TextEditor &editor, string text) :
 editor(editor), text(std::move(text)) {
-    pos.line_idx = editor.getHeight() - 1;
-    pos.char_idx = editor.getLines().at(pos.line_idx)->get_length();
+    if(ITraversable* l = dynamic_cast<ITraversable*>(editor.getLines().at(pos.line_idx))) {
+        pos.line_idx = editor.getHeight() - 1;
+        pos.char_idx = l->get_length();
+    }
 }
 
 void AppendTextCommand::execute() {
-        editor.appendText(text);
+    editor.appendText(text);
+    editor.moveCursorCharIdx(text.length(), true);
 }
 
 void AppendTextCommand::undo() {
     editor.deleteText(pos, text.size());
+    editor.moveCursorCharIdx(text.length(), false);
 }
